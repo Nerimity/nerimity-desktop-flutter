@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nerimity_desktop_flutter/models/server.dart';
 import 'package:nerimity_desktop_flutter/views/avatar.dart';
 
 class ContentArea extends StatefulWidget {
@@ -108,7 +109,9 @@ class MessageTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 8,
         children: [
-          Avatar(color: Colors.teal, label: 'SK'),
+          Avatar(
+            server: Server(id: '1', name: 'SK', hexColor: '#FF0000'),
+          ),
           Expanded(
             child: Container(
               margin: const EdgeInsets.only(top: 8),

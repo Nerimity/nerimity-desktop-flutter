@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:nerimity_desktop_flutter/models/server.dart';
+import 'package:nerimity_desktop_flutter/utils/colors.dart';
 
 class Avatar extends StatefulWidget {
-  final String label;
-  final Color color;
+  final Server? server;
+
   final bool selected;
 
-  const Avatar({
-    super.key,
-    required this.label,
-    required this.color,
-    this.selected = false,
-  });
+  const Avatar({super.key, this.server, this.selected = false});
 
   @override
   State<Avatar> createState() => _AvatarState();
@@ -19,6 +16,13 @@ class Avatar extends StatefulWidget {
 class _AvatarState extends State<Avatar> {
   @override
   Widget build(BuildContext context) {
+    final name = widget.server?.name ?? '';
+    final hexColor = widget.server?.hexColor ?? '';
+    final avatar = widget.server?.avatar;
+    final avatarUrl = avatar != null
+        ? 'https://cdn.nerimity.com/${avatar}'
+        : null;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: MouseRegion(
@@ -26,14 +30,20 @@ class _AvatarState extends State<Avatar> {
           width: 48,
           height: 48,
           decoration: BoxDecoration(
-            color: widget.color,
+            color: avatarUrl == null ? hexToColor(hexColor) : null,
             borderRadius: BorderRadius.circular(99),
           ),
           alignment: Alignment.center,
-          child: Text(
-            widget.label,
-            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-          ),
+          child: avatarUrl == null
+              ? Text(
+                  name.substring(0, 1).toUpperCase(),
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 24,
+                  ),
+                )
+              : Image.network(avatarUrl, fit: BoxFit.cover),
         ),
       ),
     );
