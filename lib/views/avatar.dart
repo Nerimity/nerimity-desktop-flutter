@@ -2,6 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:nerimity_desktop_flutter/models/server.dart';
 import 'package:nerimity_desktop_flutter/utils/colors.dart';
 
+String buildImageUrl(String url, {int? size}) {
+  final uri = Uri.parse(url);
+
+  final endsWithGif = uri.path.endsWith('.gif');
+  final endsWithHashA = uri.fragment == 'a';
+
+  if (!endsWithGif && !endsWithHashA) return url;
+
+  final newParams = Map<String, String>.from(uri.queryParameters)
+    ..['type'] = 'webp';
+
+  if (size != null) newParams['size'] = size.toString();
+
+  return uri.replace(queryParameters: newParams).toString();
+}
+
 class Avatar extends StatefulWidget {
   final Server? server;
 
@@ -20,7 +36,7 @@ class _AvatarState extends State<Avatar> {
     final hexColor = widget.server?.hexColor ?? '';
     final avatar = widget.server?.avatar;
     final avatarUrl = avatar != null
-        ? 'https://cdn.nerimity.com/$avatar'
+        ? buildImageUrl('https://cdn.nerimity.com/$avatar', size: 60)
         : null;
 
     return Padding(
@@ -43,7 +59,10 @@ class _AvatarState extends State<Avatar> {
                     fontSize: 24,
                   ),
                 )
-              : Image.network(avatarUrl, fit: BoxFit.cover),
+              : ClipRRect(
+                  borderRadius: BorderRadius.circular(99),
+                  child: Image.network(avatarUrl, fit: BoxFit.cover),
+                ),
         ),
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../avatar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nerimity_desktop_flutter/stores/server_store.dart';
@@ -13,7 +14,7 @@ class ServerList extends ConsumerWidget {
     return Container(
       width: 72,
       color: Theme.of(context).colorScheme.surfaceContainerLow,
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: ListView(children: ids.map((id) => ServerItem(id: id)).toList()),
     );
   }
@@ -27,6 +28,9 @@ class ServerItem extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final server = ref.watch(serverStoreProvider.select((s) => s[id]));
     if (server == null) return const SizedBox.shrink();
-    return Center(child: Avatar(server: server));
+    return GestureDetector(
+      onTap: () => context.go('/app/servers/$id/${server.defaultChannelId}'),
+      child: Center(child: Avatar(server: server)),
+    );
   }
 }
