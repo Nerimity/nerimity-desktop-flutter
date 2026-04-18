@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:nerimity_desktop_flutter/models/server.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nerimity_desktop_flutter/models/message.dart';
+import 'package:nerimity_desktop_flutter/stores/message_store.dart';
 import 'package:nerimity_desktop_flutter/views/avatar.dart';
 
-class MessageContent extends StatefulWidget {
+class MessageContent extends ConsumerStatefulWidget {
   final String serverId;
   final String channelId;
 
@@ -13,29 +15,47 @@ class MessageContent extends StatefulWidget {
   });
 
   @override
-  State<MessageContent> createState() => _MessageContentState();
+  ConsumerState<MessageContent> createState() => _MessageContentState();
 }
 
-class _MessageContentState extends State<MessageContent> {
-  final List<String> messages = [];
+class _MessageContentState extends ConsumerState<MessageContent> {
+  @override
+  void initState() {
+    super.initState();
+    ref.read(messageStoreProvider.notifier).loadMessages(widget.channelId);
+  }
+
+  @override
+  void didUpdateWidget(MessageContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.channelId != widget.channelId) {
+      ref.read(messageStoreProvider.notifier).loadMessages(widget.channelId);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final messages = ref.watch(
+      messageStoreProvider.select((s) => s[widget.channelId] ?? []),
+    );
+
     return Column(
       children: [
         Text('${widget.serverId} / ${widget.channelId}'),
         Expanded(
           child: ListView.builder(
-            reverse: true,
             itemCount: messages.length,
-            itemBuilder: (ctx, i) => MessageTile(message: messages[i]),
+            itemBuilder: (ctx, i) => MessageTile(
+              message: messages[i],
+              prevMessage: i > 0 ? messages[i - 1] : null,
+            ),
           ),
         ),
         MessageInput(
           channelName: 'general',
           onSubmitted: (message) {
             setState(() {
-              messages.insert(0, message);
+              // messages.insert(0, message);
             });
           },
         ),
@@ -153,39 +173,55 @@ class _MessageInputState extends State<MessageInput> {
 }
 
 class MessageTile extends StatelessWidget {
-  final String message;
-  const MessageTile({super.key, required this.message});
+  final Message message;
+  final Message? prevMessage;
+  const MessageTile({super.key, required this.message, this.prevMessage});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 8,
-        children: [
-          Avatar(
-            server: Server(
-              id: '1',
-              name: 'SK',
-              hexColor: '#FF0000',
-              defaultChannelId: '',
-            ),
-          ),
-          Expanded(
-            child: Container(
-              margin: const EdgeInsets.only(top: 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    final prevSameCreator =
+        prevMessage != null &&
+        prevMessage!.createdBy.id == message.createdBy.id;
 
-                children: [
-                  Text("SK", style: TextStyle(fontWeight: FontWeight.bold)),
-                  Text(message),
-                ],
+    return Container(
+      margin: !prevSameCreator
+          ? const EdgeInsets.only(top: 8)
+          : const EdgeInsets.only(top: 0),
+      child: InkWell(
+        onTap: () {},
+        hoverColor: const Color.fromARGB(19, 255, 255, 255),
+        child: Container(
+          padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 8,
+            children: [
+              prevSameCreator
+                  ? SizedBox(width: AvatarSize.lg.value, height: 1)
+                  : Avatar(user: message.createdBy, size: AvatarSize.lg),
+              Expanded(
+                child: Container(
+                  margin: !prevSameCreator
+                      ? const EdgeInsets.only(top: 6)
+                      : const EdgeInsets.only(top: 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+
+                    children: [
+                      prevSameCreator
+                          ? const SizedBox.shrink()
+                          : Text(
+                              message.createdBy.username,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                      Text(message.content),
+                    ],
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

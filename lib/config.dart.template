@@ -1,1 +1,2 @@
+const apiUrl = "https://nerimity.com/api";
 const userToken = '';

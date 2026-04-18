@@ -30,7 +30,9 @@ class ServerItem extends ConsumerWidget {
     if (server == null) return const SizedBox.shrink();
     return GestureDetector(
       onTap: () => context.go('/app/servers/$id/${server.defaultChannelId}'),
-      child: Center(child: Avatar(server: server)),
+      child: Center(
+        child: Avatar(server: server, size: AvatarSize.lg),
+      ),
     );
   }
 }

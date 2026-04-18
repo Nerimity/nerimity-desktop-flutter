@@ -43,6 +43,26 @@ class ChannelItem extends ConsumerWidget {
     final channel = ref.watch(channelStoreProvider.select((s) => s[id]));
     if (channel == null) return const SizedBox.shrink();
 
-    return Container(child: Text(channel.name ?? ''));
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0, left: 8.0, right: 8.0),
+      child: Material(
+        child: InkWell(
+          highlightColor: Colors.transparent,
+          splashColor: Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+
+          onTap: () {
+            context.go('/app/servers/${channel.serverId}/${channel.id}');
+          },
+          hoverColor: Colors.black,
+          child: Container(
+            padding: const EdgeInsets.all(8.0),
+
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
+            child: Text(channel.name ?? ''),
+          ),
+        ),
+      ),
+    );
   }
 }

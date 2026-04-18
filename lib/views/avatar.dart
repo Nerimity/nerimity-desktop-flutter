@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nerimity_desktop_flutter/models/server.dart';
+import 'package:nerimity_desktop_flutter/models/user.dart';
 import 'package:nerimity_desktop_flutter/utils/colors.dart';
 
 String buildImageUrl(String url, {int? size}) {
@@ -18,12 +19,31 @@ String buildImageUrl(String url, {int? size}) {
   return uri.replace(queryParameters: newParams).toString();
 }
 
+enum AvatarSize {
+  xs(16),
+  sm(24),
+  md(32),
+  lg(40),
+  xl(48),
+  xxl(64);
+
+  final double value;
+  const AvatarSize(this.value);
+}
+
 class Avatar extends StatefulWidget {
   final Server? server;
-
+  final User? user;
   final bool selected;
+  final AvatarSize size;
 
-  const Avatar({super.key, this.server, this.selected = false});
+  const Avatar({
+    super.key,
+    this.server,
+    this.user,
+    this.selected = false,
+    required this.size,
+  });
 
   @override
   State<Avatar> createState() => _AvatarState();
@@ -32,9 +52,9 @@ class Avatar extends StatefulWidget {
 class _AvatarState extends State<Avatar> {
   @override
   Widget build(BuildContext context) {
-    final name = widget.server?.name ?? '';
-    final hexColor = widget.server?.hexColor ?? '';
-    final avatar = widget.server?.avatar;
+    final name = widget.server?.name ?? widget.user?.username ?? '';
+    final hexColor = widget.server?.hexColor ?? widget.user?.hexColor ?? '';
+    final avatar = widget.server?.avatar ?? widget.user?.avatar;
     final avatarUrl = avatar != null
         ? buildImageUrl('https://cdn.nerimity.com/$avatar', size: 60)
         : null;
@@ -43,8 +63,8 @@ class _AvatarState extends State<Avatar> {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: MouseRegion(
         child: Container(
-          width: 48,
-          height: 48,
+          width: widget.size.value,
+          height: widget.size.value,
           decoration: BoxDecoration(
             color: avatarUrl == null ? hexToColor(hexColor) : null,
             borderRadius: BorderRadius.circular(99),
