@@ -24,8 +24,6 @@ class AuthenticatedPayload {
 
 void onUserAuthenticated(WidgetRef ref, dynamic payload) {
   final data = AuthenticatedPayload.fromJson(payload as Map<String, dynamic>);
-  print('servers received: ${data.servers.length}');
 
   ref.read(serverStoreProvider.notifier).addServers(data.servers);
-  print('store state: ${ref.read(serverStoreProvider).length}');
 }

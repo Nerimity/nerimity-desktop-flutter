@@ -20,7 +20,7 @@ class _AvatarState extends State<Avatar> {
     final hexColor = widget.server?.hexColor ?? '';
     final avatar = widget.server?.avatar;
     final avatarUrl = avatar != null
-        ? 'https://cdn.nerimity.com/${avatar}'
+        ? 'https://cdn.nerimity.com/$avatar'
         : null;
 
     return Padding(
