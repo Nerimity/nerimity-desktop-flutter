@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:nerimity_desktop_flutter/models/channel.dart';
 import 'package:nerimity_desktop_flutter/models/server.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,8 +29,15 @@ class AuthenticatedPayload {
       );
 }
 
-void onUserAuthenticated(WidgetRef ref, dynamic payload) {
-  final data = AuthenticatedPayload.fromJson(payload as Map<String, dynamic>);
+AuthenticatedPayload _parseAuthenticatedPayload(Map<String, dynamic> json) {
+  return AuthenticatedPayload.fromJson(json);
+}
+
+Future<void> onUserAuthenticated(WidgetRef ref, dynamic payload) async {
+  final data = await compute(
+    _parseAuthenticatedPayload,
+    payload as Map<String, dynamic>,
+  );
 
   ref.read(serverStoreProvider.notifier).addServers(data.servers);
   ref.read(channelStoreProvider.notifier).addChannels(data.channels);
