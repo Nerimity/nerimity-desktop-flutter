@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nerimity_desktop_flutter/models/message.dart';
+import 'package:nerimity_desktop_flutter/services/channel_service.dart';
 import 'package:nerimity_desktop_flutter/stores/message_store.dart';
 import 'package:nerimity_desktop_flutter/views/avatar.dart';
 
@@ -35,27 +36,35 @@ class _MessageContentState extends ConsumerState<MessageContent> {
 
   @override
   Widget build(BuildContext context) {
+    final channelId = widget.channelId;
     final messages = ref.watch(
-      messageStoreProvider.select((s) => s[widget.channelId] ?? []),
+      messageStoreProvider.select((s) => s[channelId] ?? []),
     );
 
     return Column(
       children: [
-        Text('${widget.serverId} / ${widget.channelId}'),
         Expanded(
           child: ListView.builder(
+            reverse: true,
+
             itemCount: messages.length,
-            itemBuilder: (ctx, i) => MessageTile(
-              message: messages[i],
-              prevMessage: i > 0 ? messages[i - 1] : null,
-            ),
+            itemBuilder: (ctx, i) {
+              final reversedIndex = messages.length - 1 - i;
+
+              return MessageTile(
+                message: messages[reversedIndex],
+                prevMessage: reversedIndex > 0
+                    ? messages[reversedIndex - 1]
+                    : null,
+              );
+            },
           ),
         ),
         MessageInput(
           channelName: 'general',
           onSubmitted: (message) {
             setState(() {
-              // messages.insert(0, message);
+              postMessage(channelId, message);
             });
           },
         ),

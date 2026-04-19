@@ -34,10 +34,15 @@ class MessageStore extends Notifier<Map<String, List<Message>>> {
   }
 
   void addMessage(String channelId, Message message) {
+    if (state[channelId] == null) return;
+
     final current = state[channelId] ?? [];
+    final updated = [...current, message];
     state = {
       ...state,
-      channelId: [...current, message],
+      channelId: updated.length > 100
+          ? updated.sublist(updated.length - 100)
+          : updated,
     };
   }
 }
