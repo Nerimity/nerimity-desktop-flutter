@@ -59,32 +59,27 @@ class _AvatarState extends State<Avatar> {
         ? buildImageUrl('https://cdn.nerimity.com/$avatar', size: 60)
         : null;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: MouseRegion(
-        child: Container(
-          width: widget.size.value,
-          height: widget.size.value,
-          decoration: BoxDecoration(
-            color: avatarUrl == null ? hexToColor(hexColor) : null,
-            borderRadius: BorderRadius.circular(99),
-          ),
-          alignment: Alignment.center,
-          child: avatarUrl == null
-              ? Text(
-                  name.substring(0, 1).toUpperCase(),
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 24,
-                  ),
-                )
-              : ClipRRect(
-                  borderRadius: BorderRadius.circular(99),
-                  child: Image.network(avatarUrl, fit: BoxFit.cover),
-                ),
-        ),
+    return Container(
+      width: widget.size.value,
+      height: widget.size.value,
+      decoration: BoxDecoration(
+        color: avatarUrl == null ? hexToColor(hexColor) : null,
+        borderRadius: BorderRadius.circular(99),
       ),
+      alignment: Alignment.center,
+      child: avatarUrl == null
+          ? Text(
+              name.substring(0, 1).toUpperCase(),
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w700,
+                fontSize: 24,
+              ),
+            )
+          : ClipRRect(
+              borderRadius: BorderRadius.circular(99),
+              child: Image.network(avatarUrl, fit: BoxFit.cover),
+            ),
     );
   }
 }

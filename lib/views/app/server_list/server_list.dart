@@ -14,8 +14,12 @@ class ServerList extends ConsumerWidget {
     return Container(
       width: 72,
       color: Theme.of(context).colorScheme.surfaceContainerLow,
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: ListView(children: ids.map((id) => ServerItem(id: id)).toList()),
+      child: ListView(
+        itemExtent: 46.0,
+        padding: const EdgeInsets.symmetric(vertical: 6),
+
+        children: ids.map((id) => ServerItem(id: id)).toList(),
+      ),
     );
   }
 }

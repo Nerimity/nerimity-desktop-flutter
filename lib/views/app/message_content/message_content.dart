@@ -4,6 +4,7 @@ import 'package:nerimity_desktop_flutter/models/message.dart';
 import 'package:nerimity_desktop_flutter/services/channel_service.dart';
 import 'package:nerimity_desktop_flutter/stores/message_store.dart';
 import 'package:nerimity_desktop_flutter/views/avatar.dart';
+import 'package:nerimity_desktop_flutter/views/markup.dart';
 
 class MessageContent extends ConsumerStatefulWidget {
   final String serverId;
@@ -223,7 +224,7 @@ class MessageTile extends StatelessWidget {
                               message.createdBy.username,
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
-                      Text(message.content),
+                      MarkupView(rawText: message.content, message: message),
                     ],
                   ),
                 ),

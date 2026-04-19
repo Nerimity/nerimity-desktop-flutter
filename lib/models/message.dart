@@ -1,4 +1,3 @@
-// lib/models/message.dart
 import 'package:nerimity_desktop_flutter/models/user.dart';
 
 class Message {
@@ -6,12 +5,14 @@ class Message {
   final String content;
   final String channelId;
   final User createdBy;
+  final List<User> mentions;
 
   Message({
     required this.id,
     required this.content,
     required this.channelId,
     required this.createdBy,
+    this.mentions = const [],
   });
 
   factory Message.fromJson(Map<String, dynamic> json) => Message(
@@ -19,5 +20,6 @@ class Message {
     content: json['content'],
     channelId: json['channelId'],
     createdBy: User.fromJson(json['createdBy']),
+    mentions: (json['mentions'] as List).map((m) => User.fromJson(m)).toList(),
   );
 }
