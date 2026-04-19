@@ -182,13 +182,13 @@ class _MessageInputState extends State<MessageInput> {
   }
 }
 
-class MessageTile extends StatelessWidget {
+class MessageTile extends ConsumerWidget {
   final Message message;
   final Message? prevMessage;
   const MessageTile({super.key, required this.message, this.prevMessage});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final prevSameCreator =
         prevMessage != null &&
         prevMessage!.createdBy.id == message.createdBy.id;
@@ -224,7 +224,11 @@ class MessageTile extends StatelessWidget {
                               message.createdBy.username,
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
-                      MarkupView(rawText: message.content, message: message),
+                      MarkupView(
+                        rawText: message.content,
+                        message: message,
+                        ref: ref,
+                      ),
                     ],
                   ),
                 ),

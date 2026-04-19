@@ -386,16 +386,21 @@ Entity parseMarkup(String text) {
           markers.removeRange(markerIndex, markers.length);
           entities = remaining;
 
-          if (type == "bold")
+          if (type == "bold") {
             entities.add(BoldEntity(innerSpan, outerSpan, inner));
-          if (type == "italic")
+          }
+          if (type == "italic") {
             entities.add(ItalicEntity(innerSpan, outerSpan, inner));
-          if (type == "spoiler")
+          }
+          if (type == "spoiler") {
             entities.add(SpoilerEntity(innerSpan, outerSpan, inner));
-          if (type == "underline")
+          }
+          if (type == "underline") {
             entities.add(UnderlineEntity(innerSpan, outerSpan, inner));
-          if (type == "strikethrough")
+          }
+          if (type == "strikethrough") {
             entities.add(StrikethroughEntity(innerSpan, outerSpan, inner));
+          }
         } else {
           markers.add(Marker(type: type, span: indice, data: data));
         }

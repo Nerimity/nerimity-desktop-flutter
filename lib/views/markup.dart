@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nerimity_desktop_flutter/models/channel.dart';
 import 'package:nerimity_desktop_flutter/models/message.dart';
+import 'package:nerimity_desktop_flutter/models/user.dart';
+import 'package:nerimity_desktop_flutter/stores/channel_store.dart';
 import 'package:nerimity_desktop_flutter/utils/nevula.dart';
 import 'package:nerimity_desktop_flutter/views/avatar.dart';
 
 TextSpan transformCustomTextSpan(
   Entity entity,
   String fullText,
+  WidgetRef ref,
   Message? message,
 ) {
   final String customType = entity.params["type"] ?? "";
@@ -14,47 +19,88 @@ TextSpan transformCustomTextSpan(
     entity.innerSpan.end,
   );
 
-  print('$customType $content');
+  debugPrint('$customType $content');
 
   switch (customType) {
+    case "#":
+      final channels = ref.read(channelStoreProvider);
+      final channel = channels[content];
+
+      if (channel != null && channel.name != null) {
+        return channelMention(channel);
+      }
+
     case "@":
       final user = message?.mentions.firstWhere((u) => u.id == content);
 
       if (user != null) {
-        return TextSpan(
-          children: [
-            WidgetSpan(
-              child: Container(
-                padding: const EdgeInsets.only(left: 4.0, right: 4.0),
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(28, 255, 255, 255),
-                  borderRadius: BorderRadius.circular(99),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  spacing: 4,
-                  children: [
-                    Avatar(size: AvatarSize.xs, user: user),
-                    Text(user.username),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        );
+        return userMention(user);
       }
   }
   return TextSpan(text: "[$customType:$content]");
 }
 
-TextSpan buildTextSpan(Entity entity, String fullText, Message? message) {
+TextSpan userMention(User user) {
+  return TextSpan(
+    children: [
+      WidgetSpan(
+        child: Container(
+          padding: const EdgeInsets.only(left: 4.0, right: 4.0),
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(28, 255, 255, 255),
+            borderRadius: BorderRadius.circular(99),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 4,
+            children: [
+              Avatar(size: AvatarSize.xs, user: user),
+              Text(user.username),
+            ],
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
+TextSpan channelMention(Channel channel) {
+  return TextSpan(
+    children: [
+      WidgetSpan(
+        child: Container(
+          padding: const EdgeInsets.only(left: 4.0, right: 4.0),
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(28, 255, 255, 255),
+            borderRadius: BorderRadius.circular(99),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            // spacing: 4,
+            children: [
+              // Avatar(size: AvatarSize.xs, user: user),
+              Text(channel.name!),
+            ],
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
+TextSpan buildTextSpan(
+  Entity entity,
+  String fullText,
+  WidgetRef ref,
+  Message? message,
+) {
   final String content = fullText.substring(
     entity.innerSpan.start,
     entity.innerSpan.end,
   );
 
   List<InlineSpan> children = entity.entities
-      .map((e) => buildTextSpan(e, fullText, message))
+      .map((e) => buildTextSpan(e, fullText, ref, message))
       .toList();
 
   switch (entity.type) {
@@ -126,7 +172,7 @@ TextSpan buildTextSpan(Entity entity, String fullText, Message? message) {
         ],
       );
     case "custom":
-      return transformCustomTextSpan(entity, fullText, message);
+      return transformCustomTextSpan(entity, fullText, ref, message);
     case "text":
     default:
       return TextSpan(
@@ -139,8 +185,9 @@ TextSpan buildTextSpan(Entity entity, String fullText, Message? message) {
 class MarkupView extends StatelessWidget {
   final String? rawText;
   final Message? message;
+  final WidgetRef ref;
 
-  const MarkupView({super.key, this.rawText, this.message});
+  const MarkupView({super.key, this.rawText, this.message, required this.ref});
 
   @override
   Widget build(BuildContext context) {
@@ -149,7 +196,7 @@ class MarkupView extends StatelessWidget {
     Entity fullEntityTree = addTextSpans(rootEntity);
 
     return RichText(
-      text: buildTextSpan(fullEntityTree, rawText ?? '', message),
+      text: buildTextSpan(fullEntityTree, rawText ?? '', ref, message),
     );
   }
 }
