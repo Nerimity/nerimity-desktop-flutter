@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import './socket_events.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class SocketService {
   static final SocketService instance = SocketService._();
@@ -9,8 +8,6 @@ class SocketService {
 
   WebSocketChannel? _channel;
   String token = "";
-
-  WidgetRef? ref;
 
   void connect(String token) {
     this.token = token;
@@ -36,10 +33,8 @@ class SocketService {
     }
 
     if (raw[0] == "4" && raw[1] == "2") {
-      if (ref == null) return;
-
       final decodedEvent = jsonDecode(raw.substring(2)) as List<dynamic>;
-      handleSocketEvent(ref!, decodedEvent[0], decodedEvent[1]);
+      handleSocketEvent(decodedEvent[0], decodedEvent[1]);
     }
   }
 

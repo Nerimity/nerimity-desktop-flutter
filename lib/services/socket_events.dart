@@ -2,17 +2,16 @@ import 'package:flutter/foundation.dart';
 import 'package:nerimity_desktop_flutter/models/channel.dart';
 import 'package:nerimity_desktop_flutter/models/message.dart';
 import 'package:nerimity_desktop_flutter/models/server.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nerimity_desktop_flutter/stores/channel_store.dart';
 import 'package:nerimity_desktop_flutter/stores/message_store.dart';
 import 'package:nerimity_desktop_flutter/stores/server_store.dart';
 
-void handleSocketEvent(WidgetRef ref, String event, dynamic payload) {
+void handleSocketEvent(String event, dynamic payload) {
   switch (event) {
     case 'user:authenticated':
-      onUserAuthenticated(ref, payload);
+      onUserAuthenticated(payload);
     case 'message:created':
-      onMessageCreated(ref, payload);
+      onMessageCreated(payload);
   }
 }
 
@@ -37,19 +36,16 @@ AuthenticatedPayload _parseAuthenticatedPayload(Map<String, dynamic> json) {
   return AuthenticatedPayload.fromJson(json);
 }
 
-Future<void> onUserAuthenticated(WidgetRef ref, dynamic payload) async {
+Future<void> onUserAuthenticated(dynamic payload) async {
   final data = await compute(
     _parseAuthenticatedPayload,
     payload as Map<String, dynamic>,
   );
-
-  ref.read(serverStoreProvider.notifier).addServers(data.servers);
-  ref.read(channelStoreProvider.notifier).addChannels(data.channels);
+  serverStore.addServers(data.servers);
+  channelStore.addChannels(data.channels);
 }
 
-void onMessageCreated(WidgetRef ref, dynamic payload) {
+void onMessageCreated(dynamic payload) {
   final message = Message.fromJson(payload["message"]);
-  ref
-      .read(messageStoreProvider.notifier)
-      .addMessage(message.channelId, message);
+  messageStore.addMessage(message.channelId, message);
 }

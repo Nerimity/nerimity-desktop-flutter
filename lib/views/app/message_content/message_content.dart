@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nerimity_desktop_flutter/models/message.dart';
 import 'package:nerimity_desktop_flutter/services/channel_service.dart';
 import 'package:nerimity_desktop_flutter/stores/message_store.dart';
 import 'package:nerimity_desktop_flutter/views/avatar.dart';
 import 'package:nerimity_desktop_flutter/views/markup.dart';
+import 'package:signals/signals_flutter.dart';
 
-class MessageContent extends ConsumerStatefulWidget {
+class MessageContent extends StatefulWidget {
   final String serverId;
   final String channelId;
 
@@ -17,60 +17,58 @@ class MessageContent extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<MessageContent> createState() => _MessageContentState();
+  State<MessageContent> createState() => _MessageContentState();
 }
 
-class _MessageContentState extends ConsumerState<MessageContent> {
+class _MessageContentState extends State<MessageContent> {
   @override
   void initState() {
     super.initState();
-    ref.read(messageStoreProvider.notifier).loadMessages(widget.channelId);
+    messageStore.loadMessages(widget.channelId);
   }
 
   @override
   void didUpdateWidget(MessageContent oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.channelId != widget.channelId) {
-      ref.read(messageStoreProvider.notifier).loadMessages(widget.channelId);
+      messageStore.loadMessages(widget.channelId);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final channelId = widget.channelId;
-    final messages = ref.watch(
-      messageStoreProvider.select((s) => s[channelId] ?? []),
-    );
-
     return Column(
       children: [
-        Expanded(
-          child: ListView.builder(
-            reverse: true,
-
-            itemCount: messages.length,
-            itemBuilder: (ctx, i) {
-              final reversedIndex = messages.length - 1 - i;
-
-              return MessageTile(
-                message: messages[reversedIndex],
-                prevMessage: reversedIndex > 0
-                    ? messages[reversedIndex - 1]
-                    : null,
-              );
-            },
-          ),
-        ),
+        Expanded(child: MessageLog(channelId: widget.channelId)),
         MessageInput(
           channelName: 'general',
-          onSubmitted: (message) {
-            setState(() {
-              postMessage(channelId, message);
-            });
-          },
+          onSubmitted: (message) => postMessage(widget.channelId, message),
         ),
       ],
     );
+  }
+}
+
+class MessageLog extends StatelessWidget {
+  final String channelId;
+  const MessageLog({required this.channelId, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Watch((context) {
+      final messages = messageStore.messages[channelId] ?? [];
+      return ListView.builder(
+        reverse: true,
+        itemCount: messages.length,
+        itemBuilder: (ctx, i) {
+          final reversedIndex = messages.length - 1 - i;
+          return MessageTile(
+            message: messages[reversedIndex],
+            prevMessage: reversedIndex > 0 ? messages[reversedIndex - 1] : null,
+          );
+        },
+      );
+    });
   }
 }
 
@@ -182,13 +180,13 @@ class _MessageInputState extends State<MessageInput> {
   }
 }
 
-class MessageTile extends ConsumerWidget {
+class MessageTile extends StatelessWidget {
   final Message message;
   final Message? prevMessage;
   const MessageTile({super.key, required this.message, this.prevMessage});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final prevSameCreator =
         prevMessage != null &&
         prevMessage!.createdBy.id == message.createdBy.id;
@@ -224,11 +222,7 @@ class MessageTile extends ConsumerWidget {
                               message.createdBy.username,
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
-                      MarkupView(
-                        rawText: message.content,
-                        message: message,
-                        ref: ref,
-                      ),
+                      MarkupView(rawText: message.content, message: message),
                     ],
                   ),
                 ),

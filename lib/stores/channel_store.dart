@@ -1,33 +1,20 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:signals/signals_flutter.dart';
 import '../models/channel.dart';
 
-final channelStoreProvider =
-    NotifierProvider<ChannelStore, Map<String, Channel>>(ChannelStore.new);
+final channelStore = ChannelStore();
 
-class ChannelStore extends Notifier<Map<String, Channel>> {
-  @override
-  Map<String, Channel> build() => {};
+class ChannelStore {
+  final channels = mapSignal<String, Channel>({});
 
-  void addChannels(List<Channel> channels) {
-    state = {...state, for (final s in channels) s.id: s};
+  void addChannels(List<Channel> list) {
+    channels.addAll({for (final c in list) c.id: c});
   }
 
   void addChannel(Channel channel) {
-    state = {...state, channel.id: channel};
+    channels[channel.id] = channel;
   }
 
   void removeChannel(String id) {
-    state = Map.from(state)..remove(id);
+    channels.remove(id);
   }
 }
-
-final channelsByServerProvider = Provider.family<List<Channel>, String>((
-  ref,
-  serverId,
-) {
-  return ref.watch(
-    channelStoreProvider.select(
-      (s) => s.values.where((c) => c.serverId == serverId).toList(),
-    ),
-  );
-});

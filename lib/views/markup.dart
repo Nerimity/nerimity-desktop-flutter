@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nerimity_desktop_flutter/models/channel.dart';
 import 'package:nerimity_desktop_flutter/models/message.dart';
 import 'package:nerimity_desktop_flutter/models/user.dart';
@@ -10,7 +9,6 @@ import 'package:nerimity_desktop_flutter/views/avatar.dart';
 TextSpan transformCustomTextSpan(
   Entity entity,
   String fullText,
-  WidgetRef ref,
   Message? message,
 ) {
   final String customType = entity.params["type"] ?? "";
@@ -23,8 +21,7 @@ TextSpan transformCustomTextSpan(
 
   switch (customType) {
     case "#":
-      final channels = ref.read(channelStoreProvider);
-      final channel = channels[content];
+      final channel = channelStore.channels[content];
 
       if (channel != null && channel.name != null) {
         return channelMention(channel);
@@ -88,19 +85,14 @@ TextSpan channelMention(Channel channel) {
   );
 }
 
-TextSpan buildTextSpan(
-  Entity entity,
-  String fullText,
-  WidgetRef ref,
-  Message? message,
-) {
+TextSpan buildTextSpan(Entity entity, String fullText, Message? message) {
   final String content = fullText.substring(
     entity.innerSpan.start,
     entity.innerSpan.end,
   );
 
   List<InlineSpan> children = entity.entities
-      .map((e) => buildTextSpan(e, fullText, ref, message))
+      .map((e) => buildTextSpan(e, fullText, message))
       .toList();
 
   switch (entity.type) {
@@ -172,7 +164,7 @@ TextSpan buildTextSpan(
         ],
       );
     case "custom":
-      return transformCustomTextSpan(entity, fullText, ref, message);
+      return transformCustomTextSpan(entity, fullText, message);
     case "text":
     default:
       return TextSpan(
@@ -185,9 +177,8 @@ TextSpan buildTextSpan(
 class MarkupView extends StatelessWidget {
   final String? rawText;
   final Message? message;
-  final WidgetRef ref;
 
-  const MarkupView({super.key, this.rawText, this.message, required this.ref});
+  const MarkupView({super.key, this.rawText, this.message});
 
   @override
   Widget build(BuildContext context) {
@@ -196,7 +187,7 @@ class MarkupView extends StatelessWidget {
     Entity fullEntityTree = addTextSpans(rootEntity);
 
     return RichText(
-      text: buildTextSpan(fullEntityTree, rawText ?? '', ref, message),
+      text: buildTextSpan(fullEntityTree, rawText ?? '', message),
     );
   }
 }
