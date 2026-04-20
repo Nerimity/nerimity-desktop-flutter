@@ -31,37 +31,25 @@ enum AvatarSize {
   const AvatarSize(this.value);
 }
 
-class Avatar extends StatefulWidget {
+class Avatar extends StatelessWidget {
   final Server? server;
   final User? user;
-  final bool selected;
   final AvatarSize size;
 
-  const Avatar({
-    super.key,
-    this.server,
-    this.user,
-    this.selected = false,
-    required this.size,
-  });
+  const Avatar({super.key, this.server, this.user, required this.size});
 
-  @override
-  State<Avatar> createState() => _AvatarState();
-}
-
-class _AvatarState extends State<Avatar> {
   @override
   Widget build(BuildContext context) {
-    final name = widget.server?.name ?? widget.user?.username ?? '';
-    final hexColor = widget.server?.hexColor ?? widget.user?.hexColor ?? '';
-    final avatar = widget.server?.avatar ?? widget.user?.avatar;
+    final name = server?.name ?? user?.username ?? '';
+    final hexColor = server?.hexColor ?? user?.hexColor ?? '';
+    final avatar = server?.avatar ?? user?.avatar;
     final avatarUrl = avatar != null
         ? buildImageUrl('https://cdn.nerimity.com/$avatar', size: 60)
         : null;
 
     return Container(
-      width: widget.size.value,
-      height: widget.size.value,
+      width: size.value,
+      height: size.value,
       decoration: BoxDecoration(
         color: avatarUrl == null ? hexToColor(hexColor) : null,
         borderRadius: BorderRadius.circular(99),
