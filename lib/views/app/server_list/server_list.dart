@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nerimity_desktop_flutter/theme/app_theme.dart';
 import 'package:signals/signals_flutter.dart';
 import '../../avatar.dart';
 import 'package:nerimity_desktop_flutter/stores/server_store.dart';
@@ -23,12 +24,12 @@ class _ServerListState extends State<ServerList> with SignalsMixin {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 72,
+      width: 68,
       color: Theme.of(context).colorScheme.surfaceContainerLow,
       child: Watch((context) {
         final ids = _serverIds.value;
         return ListView(
-          itemExtent: 46.0,
+          itemExtent: AvatarSize.xl.value + 4,
           padding: const EdgeInsets.symmetric(vertical: 6),
           children: ids.map((id) => ServerItem(id: id)).toList(),
         );
@@ -46,10 +47,29 @@ class ServerItem extends StatelessWidget {
     return Watch((context) {
       final server = serverStore.servers[id];
       if (server == null) return const SizedBox.shrink();
-      return GestureDetector(
-        onTap: () => context.go('/app/servers/$id/${server.defaultChannelId}'),
-        child: Center(
-          child: Avatar(server: server, size: AvatarSize.lg),
+
+      final routerState = GoRouterState.of(context);
+      final isSelected = routerState.pathParameters['serverId'] == id;
+
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 2.0, left: 2.0, right: 2.0),
+        child: Material(
+          borderRadius: BorderRadius.circular(8),
+          color: Colors.transparent,
+          child: Ink(
+            decoration: BoxDecoration(
+              color: isSelected ? AppTheme.itemSelectedBg : Colors.transparent,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(8),
+              onTap: () =>
+                  context.go('/app/servers/$id/${server.defaultChannelId}'),
+              child: Center(
+                child: Avatar(server: server, size: AvatarSize.lg),
+              ),
+            ),
+          ),
         ),
       );
     });

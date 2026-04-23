@@ -17,7 +17,7 @@ TextSpan transformCustomTextSpan(
     entity.innerSpan.end,
   );
 
-  debugPrint('$customType $content');
+  // debugPrint('$customType $content');
 
   switch (customType) {
     case "#":
@@ -28,7 +28,7 @@ TextSpan transformCustomTextSpan(
       }
 
     case "@":
-      final user = message?.mentions.firstWhere((u) => u.id == content);
+      final user = message?.mentions.where((u) => u.id == content).firstOrNull;
 
       if (user != null) {
         return userMention(user);

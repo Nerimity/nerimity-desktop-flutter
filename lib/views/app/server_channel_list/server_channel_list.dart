@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nerimity_desktop_flutter/stores/channel_store.dart';
+import 'package:nerimity_desktop_flutter/theme/app_theme.dart';
 import 'package:signals/signals_flutter.dart';
 
 class ChannelList extends StatefulWidget {
@@ -10,23 +11,18 @@ class ChannelList extends StatefulWidget {
 }
 
 class _ChannelListState extends State<ChannelList> with SignalsMixin {
-  Computed<List<String>>? _channelIds;
-  String? _lastServerId;
+  late final _serverId = createSignal<String?>(null);
+  late final _channelIds = createComputed(
+    () => channelStore.channels.values
+        .where((c) => c.serverId == _serverId.value)
+        .map((c) => c.id)
+        .toList(),
+  );
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final serverId = GoRouterState.of(context).pathParameters['serverId'];
-    if (serverId == _lastServerId) return;
-    _lastServerId = serverId;
-
-    _channelIds?.dispose();
-    _channelIds = createComputed(
-      () => channelStore.channels.values
-          .where((c) => c.serverId == serverId)
-          .map((c) => c.id)
-          .toList(),
-    );
+    _serverId.value = GoRouterState.of(context).pathParameters['serverId'];
   }
 
   @override
@@ -61,19 +57,30 @@ class ChannelItem extends StatelessWidget {
       final channel = channelStore.channels[id];
       if (channel == null) return const SizedBox.shrink();
 
+      final routerState = GoRouterState.of(context);
+      final isSelected = routerState.pathParameters['channelId'] == id;
+
       return Padding(
         padding: const EdgeInsets.only(bottom: 8.0, left: 8.0, right: 8.0),
         child: Material(
-          child: InkWell(
-            borderRadius: BorderRadius.circular(8),
-            onTap: () {
-              context.go('/app/servers/${channel.serverId}/${channel.id}');
-            },
-            hoverColor: Colors.black,
-            child: Container(
-              padding: const EdgeInsets.all(8.0),
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
-              child: Text(channel.name ?? ''),
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+          child: Ink(
+            decoration: BoxDecoration(
+              color: isSelected ? AppTheme.itemSelectedBg : Colors.transparent,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: InkWell(
+              hoverColor: AppTheme.itemHoveredBg,
+              borderRadius: BorderRadius.circular(8),
+              onTap: () {
+                context.go('/app/servers/${channel.serverId}/${channel.id}');
+              },
+              highlightColor: Colors.transparent,
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(channel.name ?? ''),
+              ),
             ),
           ),
         ),

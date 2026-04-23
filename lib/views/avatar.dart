@@ -66,7 +66,12 @@ class Avatar extends StatelessWidget {
             )
           : ClipRRect(
               borderRadius: BorderRadius.circular(99),
-              child: Image.network(avatarUrl, fit: BoxFit.cover),
+              child: Image.network(
+                avatarUrl,
+                fit: BoxFit.cover,
+                width: size.value,
+                height: size.value,
+              ),
             ),
     );
   }
