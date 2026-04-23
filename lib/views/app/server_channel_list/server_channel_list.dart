@@ -128,7 +128,7 @@ class _ChannelItemState extends State<ChannelItem> with SignalsMixin {
                       channel: channel,
                       size: channel.type == ChannelType.category.value
                           ? 12
-                          : 20,
+                          : 16,
                     ),
                     Text(
                       channel.name ?? '',
