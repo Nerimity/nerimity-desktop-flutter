@@ -12,9 +12,9 @@ class User {
   });
 
   factory User.fromJson(Map<String, dynamic> json) => User(
-    id: json['id'],
-    username: json['username'],
-    hexColor: json['hexColor'],
-    avatar: json['avatar'],
+    id: json['id'] as String,
+    username: (json['username'] ?? 'Unknown') as String,
+    hexColor: (json['hexColor'] ?? '#fff') as String,
+    avatar: json['avatar'] as String?,
   );
 }

@@ -65,8 +65,6 @@ class ChannelItem extends StatelessWidget {
         padding: const EdgeInsets.only(bottom: 8.0, left: 8.0, right: 8.0),
         child: Material(
           child: InkWell(
-            highlightColor: Colors.transparent,
-            splashColor: Colors.transparent,
             borderRadius: BorderRadius.circular(8),
             onTap: () {
               context.go('/app/servers/${channel.serverId}/${channel.id}');
