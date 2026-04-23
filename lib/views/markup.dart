@@ -135,9 +135,16 @@ TextSpan buildTextSpan(Entity entity, String fullText, Message? message) {
       );
     case "color":
       final colorStr = entity.params["color"] as String;
-      final color = colorStr == "reset"
-          ? null
-          : Color(int.parse(colorStr.replaceFirst('#', '0xFF')));
+      Color? color;
+      if (colorStr == "reset") {
+        color = null;
+      } else {
+        String hexStr = colorStr.substring(1);
+        if (hexStr.length == 3) {
+          hexStr = hexStr.split('').map((char) => '$char$char').join();
+        }
+        color = Color(int.parse('0xFF$hexStr'));
+      }
       return TextSpan(
         children: children,
         style: TextStyle(color: color),

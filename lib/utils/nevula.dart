@@ -306,7 +306,7 @@ Entity parseMarkup(String text) {
       markers.add(
         Marker(
           type: "blockquote",
-          span: Span(start: indice.start, end: indice.end + 2),
+          span: Span(start: indice.end, end: indice.end + 2),
         ),
       );
     }
@@ -323,7 +323,7 @@ Entity parseMarkup(String text) {
         Marker(
           type: "heading",
           span: Span(
-            start: indice.start,
+            start: indice.end,
             end: indice.end + headingMatch.group(0)!.length,
           ),
           data: headingMatch.group(1)?.length,
