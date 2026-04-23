@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nerimity_desktop_flutter/config.dart';
+import 'package:nerimity_desktop_flutter/models/channel.dart';
 import 'package:nerimity_desktop_flutter/stores/channel_store.dart';
 import 'package:nerimity_desktop_flutter/theme/app_theme.dart';
 import 'package:nerimity_desktop_flutter/utils/emojis.dart';
@@ -16,13 +17,25 @@ class ChannelList extends StatefulWidget {
 
 class _ChannelListState extends State<ChannelList> with SignalsMixin {
   late final _serverId = createSignal<String?>(null);
-  late final _channelIds = createComputed(
-    () => channelStore.channels.values
-        .where((c) => c.serverId == _serverId.value)
-        .map((c) => c.id)
-        .toList(),
-  );
+  late final _channelIds = createComputed(() {
+    final channels =
+        channelStore.channels.values
+            .where((c) => c.serverId == _serverId.value)
+            .toList()
+          ..sort((a, b) => (a.order ?? 0).compareTo(b.order ?? 0));
 
+    final result = <Channel>[];
+    for (final channel in channels) {
+      if (channel.type == ChannelType.category.value) {
+        result.add(channel);
+        result.addAll(channels.where((c) => c.categoryId == channel.id));
+      } else if (channel.categoryId == null) {
+        result.add(channel);
+      }
+    }
+
+    return result.map((c) => c.id).toList();
+  });
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -38,7 +51,7 @@ class _ChannelListState extends State<ChannelList> with SignalsMixin {
         children: [
           Expanded(
             child: Watch((context) {
-              final channelIds = _channelIds?.value ?? [];
+              final channelIds = _channelIds.value;
               return ListView.builder(
                 itemCount: channelIds.length,
                 itemBuilder: (ctx, i) => ChannelItem(id: channelIds[i]),
@@ -72,16 +85,15 @@ class _ChannelItemState extends State<ChannelItem> with SignalsMixin {
       final isSelected = routerState.pathParameters['channelId'] == widget.id;
       final isActive = isSelected || _isHovered.value;
 
-      final isSvgIcon = channel.icon != null && !channel.icon!.contains(".");
-
-      final iconUrl = channel.icon != null
-          ? isSvgIcon
-                ? unicodeToTwemojiUrl(channel.icon!)
-                : buildImageUrl('${cdnUrl}emojis/${channel.icon}', size: 28)
-          : null;
+      final isCategory = channel.type == ChannelType.category.value;
 
       return Padding(
-        padding: const EdgeInsets.only(bottom: 2.0, left: 8.0, right: 8.0),
+        padding: EdgeInsets.only(
+          bottom: 2.0,
+          left: isCategory ? 0 : 8.0,
+          right: 8.0,
+          top: isCategory ? 10 : 0,
+        ),
         child: Material(
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(8),
@@ -106,31 +118,27 @@ class _ChannelItemState extends State<ChannelItem> with SignalsMixin {
                 child: Row(
                   spacing: 8,
                   children: [
-                    iconUrl != null
-                        ? isSvgIcon
-                              ? SvgPicture.network(
-                                  iconUrl,
-                                  width: 20,
-                                  height: 20,
-                                )
-                              : Image.network(
-                                  iconUrl,
-                                  width: 20,
-                                  height: 20,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      const SizedBox.shrink(),
-                                )
-                        : const Icon(
-                            Icons.tag,
-                            size: 20,
-                            color: Colors.white70,
-                          ),
+                    if (isCategory)
+                      Icon(
+                        Icons.keyboard_arrow_down,
+                        size: 10,
+                        color: Colors.white70,
+                      ),
+                    ChannelIcon(
+                      channel: channel,
+                      size: channel.type == ChannelType.category.value
+                          ? 12
+                          : 20,
+                    ),
                     Text(
                       channel.name ?? '',
                       style: TextStyle(
-                        color: Colors.white.withValues(
-                          alpha: isActive ? 1.0 : 0.6,
-                        ),
+                        fontSize: isCategory ? 12 : 14,
+                        color: isCategory
+                            ? Colors.white
+                            : Colors.white.withValues(
+                                alpha: isActive ? 1.0 : 0.6,
+                              ),
                       ),
                     ),
                   ],
@@ -141,5 +149,34 @@ class _ChannelItemState extends State<ChannelItem> with SignalsMixin {
         ),
       );
     });
+  }
+}
+
+class ChannelIcon extends StatelessWidget {
+  final Channel channel;
+  final double size;
+  const ChannelIcon({super.key, required this.channel, required this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    final isSvgIcon = channel.icon != null && !channel.icon!.contains(".");
+
+    final iconUrl = channel.icon != null
+        ? isSvgIcon
+              ? unicodeToTwemojiUrl(channel.icon!)
+              : buildImageUrl('${cdnUrl}emojis/${channel.icon}', size: 28)
+        : null;
+
+    return iconUrl != null
+        ? isSvgIcon
+              ? SvgPicture.network(iconUrl, width: size, height: size)
+              : Image.network(
+                  iconUrl,
+                  width: size,
+                  height: size,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const SizedBox.shrink(),
+                )
+        : Icon(Icons.tag, size: size, color: Colors.white70);
   }
 }
