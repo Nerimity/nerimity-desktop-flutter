@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nerimity_desktop_flutter/config.dart';
 import 'package:nerimity_desktop_flutter/stores/channel_store.dart';
 import 'package:nerimity_desktop_flutter/theme/app_theme.dart';
+import 'package:nerimity_desktop_flutter/utils/emojis.dart';
+import 'package:nerimity_desktop_flutter/utils/image.dart';
 import 'package:signals/signals_flutter.dart';
 
 class ChannelList extends StatefulWidget {
@@ -68,6 +72,14 @@ class _ChannelItemState extends State<ChannelItem> with SignalsMixin {
       final isSelected = routerState.pathParameters['channelId'] == widget.id;
       final isActive = isSelected || _isHovered.value;
 
+      final isSvgIcon = channel.icon != null && !channel.icon!.contains(".");
+
+      final iconUrl = channel.icon != null
+          ? isSvgIcon
+                ? unicodeToTwemojiUrl(channel.icon!)
+                : buildImageUrl('${cdnUrl}emojis/${channel.icon}', size: 60)
+          : null;
+
       return Padding(
         padding: const EdgeInsets.only(bottom: 2.0, left: 8.0, right: 8.0),
         child: Material(
@@ -91,11 +103,37 @@ class _ChannelItemState extends State<ChannelItem> with SignalsMixin {
                   vertical: 6.0,
                   horizontal: 12.0,
                 ),
-                child: Text(
-                  channel.name ?? '',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: isActive ? 1.0 : 0.6),
-                  ),
+                child: Row(
+                  spacing: 8,
+                  children: [
+                    iconUrl != null
+                        ? isSvgIcon
+                              ? SvgPicture.network(
+                                  iconUrl,
+                                  width: 20,
+                                  height: 20,
+                                )
+                              : Image.network(
+                                  iconUrl,
+                                  width: 20,
+                                  height: 20,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      const SizedBox.shrink(),
+                                )
+                        : const Icon(
+                            Icons.tag,
+                            size: 20,
+                            color: Colors.white70,
+                          ),
+                    Text(
+                      channel.name ?? '',
+                      style: TextStyle(
+                        color: Colors.white.withValues(
+                          alpha: isActive ? 1.0 : 0.6,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

@@ -208,23 +208,18 @@ class MessageTile extends StatelessWidget {
                   ? SizedBox(width: AvatarSize.lg.value, height: 1)
                   : Avatar(user: message.createdBy, size: AvatarSize.lg),
               Expanded(
-                child: Container(
-                  margin: !prevSameCreator
-                      ? const EdgeInsets.only(top: 6)
-                      : const EdgeInsets.only(top: 0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
 
-                    children: [
-                      prevSameCreator
-                          ? const SizedBox.shrink()
-                          : Text(
-                              message.createdBy.username,
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                      MarkupView(rawText: message.content, message: message),
-                    ],
-                  ),
+                  children: [
+                    prevSameCreator
+                        ? const SizedBox.shrink()
+                        : Text(
+                            message.createdBy.username,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                    MarkupView(rawText: message.content, message: message),
+                  ],
                 ),
               ),
             ],

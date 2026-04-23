@@ -1,23 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:nerimity_desktop_flutter/config.dart';
 import 'package:nerimity_desktop_flutter/models/server.dart';
 import 'package:nerimity_desktop_flutter/models/user.dart';
 import 'package:nerimity_desktop_flutter/utils/colors.dart';
-
-String buildImageUrl(String url, {int? size}) {
-  final uri = Uri.parse(url);
-
-  final endsWithGif = uri.path.endsWith('.gif');
-  final endsWithHashA = uri.fragment == 'a';
-
-  if (!endsWithGif && !endsWithHashA) return url;
-
-  final newParams = Map<String, String>.from(uri.queryParameters)
-    ..['type'] = 'webp';
-
-  if (size != null) newParams['size'] = size.toString();
-
-  return uri.replace(queryParameters: newParams).toString();
-}
+import 'package:nerimity_desktop_flutter/utils/image.dart';
 
 enum AvatarSize {
   xs(16),
@@ -44,7 +30,7 @@ class Avatar extends StatelessWidget {
     final hexColor = server?.hexColor ?? user?.hexColor ?? '';
     final avatar = server?.avatar ?? user?.avatar;
     final avatarUrl = avatar != null
-        ? buildImageUrl('https://cdn.nerimity.com/$avatar', size: 60)
+        ? buildImageUrl('$cdnUrl$avatar', size: 60)
         : null;
 
     return Container(

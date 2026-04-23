@@ -1,2 +1,4 @@
 const apiUrl = "https://nerimity.com/api";
+const twemojiUrl = "https://nerimity.com/twemojis/";
+const cdnUrl = "https://cdn.nerimity.com/";
 const userToken = '';
