@@ -77,7 +77,7 @@ class _ChannelItemState extends State<ChannelItem> with SignalsMixin {
       final iconUrl = channel.icon != null
           ? isSvgIcon
                 ? unicodeToTwemojiUrl(channel.icon!)
-                : buildImageUrl('${cdnUrl}emojis/${channel.icon}', size: 60)
+                : buildImageUrl('${cdnUrl}emojis/${channel.icon}', size: 28)
           : null;
 
       return Padding(
