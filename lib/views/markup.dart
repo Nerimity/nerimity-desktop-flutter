@@ -193,8 +193,8 @@ class MarkupView extends StatelessWidget {
 
     Entity fullEntityTree = addTextSpans(rootEntity);
 
-    return RichText(
-      text: buildTextSpan(fullEntityTree, rawText ?? '', message),
+    return Text.rich(
+      buildTextSpan(fullEntityTree, rawText ?? '', message),
     );
   }
 }
