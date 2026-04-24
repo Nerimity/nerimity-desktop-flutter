@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:nerimity_desktop_flutter/config.dart';
 import 'package:nerimity_desktop_flutter/models/channel.dart';
 import 'package:nerimity_desktop_flutter/stores/channel_store.dart';
+import 'package:nerimity_desktop_flutter/stores/server_store.dart';
 import 'package:nerimity_desktop_flutter/theme/app_theme.dart';
 import 'package:nerimity_desktop_flutter/utils/emojis.dart';
 import 'package:nerimity_desktop_flutter/utils/image.dart';
@@ -16,13 +17,9 @@ class ChannelList extends StatefulWidget {
 }
 
 class _ChannelListState extends State<ChannelList> with SignalsMixin {
-  late final _serverId = createSignal<String?>(null);
   late final _channelIds = createComputed(() {
-    final channels =
-        channelStore.channels.values
-            .where((c) => c.serverId == _serverId.value)
-            .toList()
-          ..sort((a, b) => (a.order ?? 0).compareTo(b.order ?? 0));
+    final channels = [...serverStore.currentServerChannels.value]
+      ..sort((a, b) => (a.order ?? 0).compareTo(b.order ?? 0));
 
     final result = <Channel>[];
     for (final channel in channels) {
@@ -36,11 +33,6 @@ class _ChannelListState extends State<ChannelList> with SignalsMixin {
 
     return result.map((c) => c.id).toList();
   });
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _serverId.value = GoRouterState.of(context).pathParameters['serverId'];
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,8 +73,7 @@ class _ChannelItemState extends State<ChannelItem> with SignalsMixin {
       final channel = channelStore.channels[widget.id];
       if (channel == null) return const SizedBox.shrink();
 
-      final routerState = GoRouterState.of(context);
-      final isSelected = routerState.pathParameters['channelId'] == widget.id;
+      final isSelected = channelStore.currentChannelId.value == widget.id;
       final isActive = isSelected || _isHovered.value;
 
       final isCategory = channel.type == ChannelType.category.value;

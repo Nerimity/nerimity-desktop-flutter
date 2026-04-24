@@ -4,6 +4,8 @@ import '../models/channel.dart';
 final channelStore = ChannelStore();
 
 class ChannelStore {
+  final Signal<String?> currentChannelId = signal(null);
+
   final channels = mapSignal<String, Channel>({});
 
   void addChannels(List<Channel> list) {
@@ -17,4 +19,12 @@ class ChannelStore {
   void removeChannel(String id) {
     channels.remove(id);
   }
+
+  void setCurrentChannelId(String? id) {
+    currentChannelId.value = id;
+  }
+
+  late final Computed<Channel?> currentChannel = computed(() {
+    return channels[currentChannelId.value];
+  });
 }

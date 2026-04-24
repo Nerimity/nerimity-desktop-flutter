@@ -48,8 +48,7 @@ class ServerItem extends StatelessWidget {
       final server = serverStore.servers[id];
       if (server == null) return const SizedBox.shrink();
 
-      final routerState = GoRouterState.of(context);
-      final isSelected = routerState.pathParameters['serverId'] == id;
+      final isSelected = serverStore.currentServerId.value == id;
 
       return Padding(
         padding: const EdgeInsets.only(bottom: 2.0, left: 2.0, right: 2.0),

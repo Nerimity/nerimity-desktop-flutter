@@ -1,9 +1,12 @@
+import 'package:nerimity_desktop_flutter/models/channel.dart';
 import 'package:nerimity_desktop_flutter/models/server.dart';
+import 'package:nerimity_desktop_flutter/stores/channel_store.dart';
 import 'package:signals/signals_flutter.dart';
 
 final serverStore = ServerStore();
 
 class ServerStore {
+  final Signal<String?> currentServerId = signal(null);
   final servers = mapSignal<String, Server>({});
 
   void addServers(List<Server> list) {
@@ -17,4 +20,14 @@ class ServerStore {
   void removeServer(String id) {
     servers.remove(id);
   }
+
+  void setCurrentServerId(String? id) {
+    currentServerId.value = id;
+  }
+
+  late final Computed<List<Channel>> currentServerChannels = computed(() {
+    return channelStore.channels.values
+        .where((c) => c.serverId == currentServerId.value)
+        .toList();
+  });
 }
