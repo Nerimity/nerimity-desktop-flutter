@@ -113,7 +113,6 @@ class _ChannelItemState extends State<ChannelItem> with SignalsMixin {
                       Icon(
                         Icons.keyboard_arrow_down,
                         size: 10,
-                        color: Colors.white70,
                       ),
                     ChannelIcon(
                       channel: channel,
@@ -126,10 +125,9 @@ class _ChannelItemState extends State<ChannelItem> with SignalsMixin {
                       style: TextStyle(
                         fontSize: isCategory ? 12 : 14,
                         color: isCategory
-                            ? Colors.white
-                            : Colors.white.withValues(
-                                alpha: isActive ? 1.0 : 0.6,
-                              ),
+                            ? Theme.of(context).colorScheme.onSurface
+                            : Theme.of(context).colorScheme.onSurface
+                                  .withValues(alpha: isActive ? 1.0 : 0.6),
                       ),
                     ),
                   ],
@@ -168,6 +166,6 @@ class ChannelIcon extends StatelessWidget {
                   errorBuilder: (context, error, stackTrace) =>
                       const SizedBox.shrink(),
                 )
-        : Icon(Icons.tag, size: size, color: Colors.white70);
+        : Icon(Icons.tag, size: size);
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nerimity_desktop_flutter/utils/theme_notifier.dart';
 import 'theme/app_theme.dart';
 import 'package:nerimity_desktop_flutter/services/socket_service.dart';
 import './router.dart';
@@ -21,10 +22,17 @@ class _MainAppState extends State<MainApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.dark(),
-      routerConfig: router,
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: themeNotifier,
+      builder: (context, mode, _) {
+        return MaterialApp.router(
+          debugShowCheckedModeBanner: false,
+          themeMode: mode,
+          theme: AppTheme.light(),
+          darkTheme: AppTheme.dark(),
+          routerConfig: router,
+        );
+      },
     );
   }
 }

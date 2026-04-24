@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nerimity_desktop_flutter/theme/app_theme.dart';
+import 'package:nerimity_desktop_flutter/utils/theme_notifier.dart';
 import 'package:signals/signals_flutter.dart';
 import '../../avatar.dart';
 import 'package:nerimity_desktop_flutter/stores/server_store.dart';
@@ -26,14 +27,25 @@ class _ServerListState extends State<ServerList> with SignalsMixin {
     return Container(
       width: 68,
       color: Theme.of(context).colorScheme.surfaceContainerLow,
-      child: Watch((context) {
-        final ids = _serverIds.value;
-        return ListView(
-          itemExtent: AvatarSize.xl.value + 4,
-          padding: const EdgeInsets.symmetric(vertical: 6),
-          children: ids.map((id) => ServerItem(id: id)).toList(),
-        );
-      }),
+      child: Column(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.brightness_6),
+            onPressed: toggleTheme,
+            iconSize: 10,
+          ),
+          Expanded(
+            child: Watch((context) {
+              final ids = _serverIds.value;
+              return ListView(
+                itemExtent: AvatarSize.xl.value + 4,
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                children: ids.map((id) => ServerItem(id: id)).toList(),
+              );
+            }),
+          ),
+        ],
+      ),
     );
   }
 }

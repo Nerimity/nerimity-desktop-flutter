@@ -75,7 +75,7 @@ TextSpan channelMention(Channel channel) {
             mainAxisSize: MainAxisSize.min,
             spacing: 4,
             children: [
-              Icon(Icons.tag, size: 14, color: Colors.white70),
+              Icon(Icons.tag, size: 14),
               Text(channel.name!),
             ],
           ),
