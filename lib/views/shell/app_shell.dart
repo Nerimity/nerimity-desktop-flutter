@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:nerimity_desktop_flutter/stores/channel_store.dart';
 import 'package:nerimity_desktop_flutter/stores/server_store.dart';
 import 'package:nerimity_desktop_flutter/views/app/server_channel_list/server_channel_list.dart';
+import 'package:nerimity_desktop_flutter/views/app/server_member_list/server_member_list.dart';
 import '../app/server_list/server_list.dart';
 
 class AppShell extends StatelessWidget {
@@ -60,8 +61,9 @@ class _ChatLayoutState extends State<ChatLayout> {
       color: Theme.of(context).colorScheme.surfaceContainerHigh,
       child: Row(
         children: [
-          ChannelList(),
+          ServerChannelList(),
           Expanded(child: widget.child),
+          ServerMemberList(),
         ],
       ),
     );

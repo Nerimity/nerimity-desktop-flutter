@@ -10,13 +10,14 @@ import 'package:nerimity_desktop_flutter/utils/emojis.dart';
 import 'package:nerimity_desktop_flutter/utils/image.dart';
 import 'package:signals/signals_flutter.dart';
 
-class ChannelList extends StatefulWidget {
-  const ChannelList({super.key});
+class ServerChannelList extends StatefulWidget {
+  const ServerChannelList({super.key});
   @override
-  State<ChannelList> createState() => _ChannelListState();
+  State<ServerChannelList> createState() => _ServerChannelListState();
 }
 
-class _ChannelListState extends State<ChannelList> with SignalsMixin {
+class _ServerChannelListState extends State<ServerChannelList>
+    with SignalsMixin {
   late final _channelIds = createComputed(() {
     final channels = [...serverStore.currentServerChannels.value]
       ..sort((a, b) => (a.order ?? 0).compareTo(b.order ?? 0));
@@ -109,11 +110,7 @@ class _ChannelItemState extends State<ChannelItem> with SignalsMixin {
                 child: Row(
                   spacing: 8,
                   children: [
-                    if (isCategory)
-                      Icon(
-                        Icons.keyboard_arrow_down,
-                        size: 10,
-                      ),
+                    if (isCategory) Icon(Icons.keyboard_arrow_down, size: 10),
                     ChannelIcon(
                       channel: channel,
                       size: channel.type == ChannelType.category.value
