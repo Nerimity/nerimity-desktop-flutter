@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nerimity_desktop_flutter/models/server_member.dart';
 import 'package:nerimity_desktop_flutter/models/server_role.dart';
-import 'package:nerimity_desktop_flutter/stores/server_member_store.dart';
-import 'package:nerimity_desktop_flutter/stores/server_roles_store.dart';
 import 'package:nerimity_desktop_flutter/stores/server_store.dart';
 import 'package:nerimity_desktop_flutter/stores/user_store.dart';
 import 'package:nerimity_desktop_flutter/theme/app_theme.dart';

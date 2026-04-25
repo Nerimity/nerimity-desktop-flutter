@@ -1,7 +1,5 @@
-import 'package:nerimity_desktop_flutter/models/channel.dart';
 import 'package:nerimity_desktop_flutter/models/raw_server_member.dart';
 import 'package:nerimity_desktop_flutter/models/server_member.dart';
-import 'package:nerimity_desktop_flutter/stores/channel_store.dart';
 import 'package:nerimity_desktop_flutter/stores/user_store.dart';
 import 'package:signals/signals_flutter.dart';
 
