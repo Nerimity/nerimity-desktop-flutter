@@ -29,6 +29,10 @@ class ServerStore {
     currentServerId.value = id;
   }
 
+  late final Computed<Server?> currentServer = computed(() {
+    return servers[currentServerId.value];
+  });
+
   late final Computed<Iterable<Channel>> currentServerChannels = computed(() {
     return channelStore.channels.values.where(
       (c) => c.serverId == currentServerId.value,
@@ -44,4 +48,9 @@ class ServerStore {
       computed(() {
         return serverRolesStore.serverRoles[currentServerId.value];
       });
+
+  late final Computed<ServerRole?> currentServerDefaultRole = computed(() {
+    final defaultRoleId = currentServer()?.defaultRoleId;
+    return serverRolesStore.serverRoles[currentServerId.value]?[defaultRoleId];
+  });
 }

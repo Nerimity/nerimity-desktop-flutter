@@ -9,10 +9,18 @@ import 'package:nerimity_desktop_flutter/views/avatar.dart';
 import 'package:nerimity_desktop_flutter/views/cdn_icon.dart';
 import 'package:signals/signals_flutter.dart';
 
+final _offlineRole = ServerRole(
+  id: 'offline',
+  serverId: '',
+  name: '',
+  order: 0,
+  hideRole: false,
+);
 List<({ServerRole role, List<ServerMember> members})> _buildCategorizedMembers(
   List<ServerRole> roles,
   Iterable<ServerMember> serverMembers,
 ) {
+  final defaultRole = serverStore.currentServerDefaultRole();
   final sortedRoles = [...roles.where((r) => !r.hideRole)];
   sortedRoles.sort((a, b) => b.order.compareTo(a.order));
 
@@ -21,11 +29,14 @@ List<({ServerRole role, List<ServerMember> members})> _buildCategorizedMembers(
   };
 
   final buckets = <String, List<ServerMember>>{};
+  final offlineMembers = <ServerMember>[];
 
   for (final member in serverMembers) {
     final offline = !userPresenceStore.presences.containsKey(member.userId);
-    if (offline) continue;
-    if (member.roleIds.isEmpty) continue;
+    if (offline) {
+      offlineMembers.add(member);
+      continue;
+    }
 
     String? topRoleId;
     int? bestIndex;
@@ -38,7 +49,12 @@ List<({ServerRole role, List<ServerMember> members})> _buildCategorizedMembers(
       }
     }
 
-    if (topRoleId == null) continue;
+    if (topRoleId == null) {
+      if (defaultRole != null) {
+        (buckets[defaultRole.id] ??= []).add(member);
+      }
+      continue;
+    }
     (buckets[topRoleId] ??= []).add(member);
   }
 
@@ -46,6 +62,8 @@ List<({ServerRole role, List<ServerMember> members})> _buildCategorizedMembers(
     for (final role in sortedRoles)
       if (buckets.containsKey(role.id))
         (role: role, members: buckets[role.id]!),
+    if (offlineMembers.isNotEmpty)
+      (role: _offlineRole, members: offlineMembers),
   ];
 }
 
@@ -107,8 +125,9 @@ class RoleHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Watch((context) {
+      final offlineRole = id == "offline";
       final role = serverStore.currentServerRoles.value?[id];
-      if (role == null) return const SizedBox.shrink();
+      if (!offlineRole && role == null) return const SizedBox.shrink();
 
       return Padding(
         padding: EdgeInsets.only(bottom: 2.0, right: 8.0),
@@ -130,12 +149,12 @@ class RoleHeader extends StatelessWidget {
                 child: Row(
                   spacing: 8,
                   children: [
-                    if (role.icon != null) CdnIcon(serverRole: role, size: 12),
+                    if (role?.icon != null) CdnIcon(serverRole: role, size: 12),
 
                     Transform.translate(
                       offset: Offset(0, -1),
                       child: Text(
-                        "${role.name} ($count)",
+                        "${role?.name ?? "Offline"} ($count)",
                         style: TextStyle(
                           fontSize: 12,
                           color: Theme.of(
