@@ -25,8 +25,28 @@ jobs:
       - name: Build Web (WASM)
         run: flutter build web --wasm
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - name: Zip The Build
+        uses: vimtor/action-zip@v1
         with:
-          name: web-build
-          path: build/web
+          files: build/web/
+          dest: flutter-web.zip
+
+      - name: Deploy to Server
+        uses: marcodallasanta/ssh-scp-deploy@v1.2.0
+        with:
+          local: "flutter-web.zip"
+          remote: "/var/www/flutter-web.zip"
+          host: ${{ secrets.HOST }}
+          user: ${{ secrets.USER }}
+          password: ${{ secrets.PASS }}
+
+      - name: Unzip built
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          password: ${{ secrets.PASS }}
+          port: ${{ secrets.PORT }}
+          script: |
+            unzip -o -DD /var/www/flutter-web.zip -d /var/www/flutter.nerimity.com
+            rm -rf /var/www/flutter-web.zip
