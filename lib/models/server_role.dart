@@ -2,13 +2,17 @@ class ServerRole {
   final String id;
   final String serverId;
   final String name;
+  final bool hideRole;
   final int order;
+  final String? icon;
 
   ServerRole({
     required this.id,
     required this.serverId,
     required this.name,
     required this.order,
+    required this.hideRole,
+    this.icon,
   });
 
   factory ServerRole.fromJson(Map<String, dynamic> json) => ServerRole(
@@ -16,5 +20,7 @@ class ServerRole {
     serverId: json['serverId'] as String,
     name: json['name'] as String,
     order: json['order'] as int,
+    hideRole: json['hideRole'] as bool,
+    icon: json['icon'] as String?,
   );
 }

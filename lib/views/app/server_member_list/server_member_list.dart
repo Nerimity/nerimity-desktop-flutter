@@ -4,13 +4,16 @@ import 'package:nerimity_desktop_flutter/models/server_role.dart';
 import 'package:nerimity_desktop_flutter/stores/server_store.dart';
 import 'package:nerimity_desktop_flutter/stores/user_store.dart';
 import 'package:nerimity_desktop_flutter/theme/app_theme.dart';
+import 'package:nerimity_desktop_flutter/views/avatar.dart';
+import 'package:nerimity_desktop_flutter/views/cdn_icon.dart';
 import 'package:signals/signals_flutter.dart';
 
 List<({ServerRole role, List<ServerMember> members})> _buildCategorizedMembers(
   List<ServerRole> roles,
   Iterable<ServerMember> serverMembers,
 ) {
-  final sortedRoles = [...roles]..sort((a, b) => b.order.compareTo(a.order));
+  final sortedRoles = [...roles.where((r) => !r.hideRole)];
+  sortedRoles.sort((a, b) => b.order.compareTo(a.order));
 
   final roleOrder = <String, int>{
     for (var i = 0; i < sortedRoles.length; i++) sortedRoles[i].id: i,
@@ -121,7 +124,22 @@ class RoleHeader extends StatelessWidget {
                 ),
                 child: Row(
                   spacing: 8,
-                  children: [Text(role.name, style: TextStyle(fontSize: 14))],
+                  children: [
+                    if (role.icon != null) CdnIcon(serverRole: role, size: 12),
+
+                    Transform.translate(
+                      offset: Offset(0, -1),
+                      child: Text(
+                        role.name,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.6),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -164,6 +182,7 @@ class MemberTile extends StatelessWidget {
                 child: Row(
                   spacing: 8,
                   children: [
+                    Avatar(user: user, size: AvatarSize.md),
                     Text(user.username, style: TextStyle(fontSize: 14)),
                   ],
                 ),

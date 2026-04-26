@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nerimity_desktop_flutter/config.dart';
 import 'package:nerimity_desktop_flutter/models/channel.dart';
 import 'package:nerimity_desktop_flutter/stores/channel_store.dart';
 import 'package:nerimity_desktop_flutter/stores/server_store.dart';
 import 'package:nerimity_desktop_flutter/theme/app_theme.dart';
-import 'package:nerimity_desktop_flutter/utils/emojis.dart';
-import 'package:nerimity_desktop_flutter/utils/image.dart';
+import 'package:nerimity_desktop_flutter/views/cdn_icon.dart';
 import 'package:signals/signals_flutter.dart';
 
 class ServerChannelList extends StatefulWidget {
@@ -111,7 +108,8 @@ class _ChannelItemState extends State<ChannelItem> with SignalsMixin {
                   spacing: 8,
                   children: [
                     if (isCategory) Icon(Icons.keyboard_arrow_down, size: 10),
-                    ChannelIcon(
+                    CdnIcon(
+                      fallbackIcon: Icons.tag,
                       channel: channel,
                       size: channel.type == ChannelType.category.value
                           ? 12
@@ -121,10 +119,8 @@ class _ChannelItemState extends State<ChannelItem> with SignalsMixin {
                       channel.name ?? '',
                       style: TextStyle(
                         fontSize: isCategory ? 12 : 14,
-                        color: isCategory
-                            ? Theme.of(context).colorScheme.onSurface
-                            : Theme.of(context).colorScheme.onSurface
-                                  .withValues(alpha: isActive ? 1.0 : 0.6),
+                        color: Theme.of(context).colorScheme.onSurface
+                            .withValues(alpha: isActive ? 1.0 : 0.6),
                       ),
                     ),
                   ],
@@ -135,34 +131,5 @@ class _ChannelItemState extends State<ChannelItem> with SignalsMixin {
         ),
       );
     });
-  }
-}
-
-class ChannelIcon extends StatelessWidget {
-  final Channel channel;
-  final double size;
-  const ChannelIcon({super.key, required this.channel, required this.size});
-
-  @override
-  Widget build(BuildContext context) {
-    final isSvgIcon = channel.icon != null && !channel.icon!.contains(".");
-
-    final iconUrl = channel.icon != null
-        ? isSvgIcon
-              ? unicodeToTwemojiUrl(channel.icon!)
-              : buildImageUrl('${cdnUrl}emojis/${channel.icon}', size: 28)
-        : null;
-
-    return iconUrl != null
-        ? isSvgIcon
-              ? SvgPicture.network(iconUrl, width: size, height: size)
-              : Image.network(
-                  iconUrl,
-                  width: size,
-                  height: size,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const SizedBox.shrink(),
-                )
-        : Icon(Icons.tag, size: size);
   }
 }
