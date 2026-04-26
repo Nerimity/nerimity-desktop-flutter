@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nerimity_desktop_flutter/models/message.dart';
 import 'package:nerimity_desktop_flutter/services/channel_service.dart';
 import 'package:nerimity_desktop_flutter/stores/message_store.dart';
+import 'package:nerimity_desktop_flutter/views/app_text_field.dart';
 import 'package:nerimity_desktop_flutter/views/avatar.dart';
 import 'package:nerimity_desktop_flutter/views/markup.dart';
 import 'package:signals/signals_flutter.dart';
@@ -91,12 +92,6 @@ class _MessageInputState extends State<MessageInput> {
   final FocusNode _focusNode = FocusNode();
 
   @override
-  void initState() {
-    super.initState();
-    _focusNode.addListener(() => setState(() {}));
-  }
-
-  @override
   void dispose() {
     _controller.dispose();
     _focusNode.dispose();
@@ -117,61 +112,11 @@ class _MessageInputState extends State<MessageInput> {
       child: Row(
         children: [
           Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Stack(
-                children: [
-                  Column(
-                    children: [
-                      TextField(
-                        controller: _controller,
-                        focusNode: _focusNode,
-                        onSubmitted: _handleSubmitted,
-                        style: const TextStyle(fontSize: 14),
-                        decoration: InputDecoration(
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: Colors.grey.shade800,
-                              width: 1.0,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: Colors.grey.shade800,
-                              width: 1.0,
-                            ),
-                          ),
-                          hintStyle: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey.shade600,
-                          ),
-                          hintText: 'Send a message to ${widget.channelName}',
-                        ),
-                      ),
-                    ],
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      height: 1,
-                      decoration: BoxDecoration(
-                        color: _focusNode.hasFocus
-                            ? const Color(0xff4c93ff)
-                            : Colors.transparent,
-                        borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(8),
-                          bottomRight: Radius.circular(8),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            child: AppTextField(
+              hintText: 'Send a message to ${widget.channelName}',
+              controller: _controller,
+              focusNode: _focusNode,
+              onSubmitted: _handleSubmitted,
             ),
           ),
         ],

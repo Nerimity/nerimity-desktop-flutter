@@ -1,11 +1,13 @@
 import 'package:go_router/go_router.dart';
+import 'package:nerimity_desktop_flutter/views/login/login.dart';
 import 'package:nerimity_desktop_flutter/views/shell/app_shell.dart';
 import 'package:nerimity_desktop_flutter/views/app/message_content/message_content.dart';
 import 'package:flutter/material.dart';
 
 final router = GoRouter(
-  initialLocation: '/app/servers/1234/1234566',
+  initialLocation: '/login',
   routes: [
+    GoRoute(path: "/login", builder: (ctx, state) => const LoginPage()),
     ShellRoute(
       builder: (ctx, state, child) => AppShell(child: child),
       routes: [

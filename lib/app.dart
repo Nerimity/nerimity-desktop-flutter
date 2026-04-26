@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:nerimity_desktop_flutter/utils/secure_storage.dart';
 import 'package:nerimity_desktop_flutter/utils/theme_notifier.dart';
 import 'theme/app_theme.dart';
 import 'package:nerimity_desktop_flutter/services/socket_service.dart';
 import './router.dart';
-
-import '../config.dart';
 
 class MainApp extends StatefulWidget {
   const MainApp({super.key});
@@ -17,7 +16,14 @@ class _MainAppState extends State<MainApp> {
   @override
   void initState() {
     super.initState();
-    SocketService.instance.connect(userToken);
+    connect();
+  }
+
+  void connect() async {
+    final token = await getToken();
+    if (token != null) {
+      SocketService.instance.connect(token);
+    }
   }
 
   @override

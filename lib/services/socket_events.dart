@@ -4,11 +4,13 @@ import 'package:nerimity_desktop_flutter/models/message.dart';
 import 'package:nerimity_desktop_flutter/models/raw_server_member.dart';
 import 'package:nerimity_desktop_flutter/models/server.dart';
 import 'package:nerimity_desktop_flutter/models/server_role.dart';
+import 'package:nerimity_desktop_flutter/models/user_presence.dart';
 import 'package:nerimity_desktop_flutter/stores/channel_store.dart';
 import 'package:nerimity_desktop_flutter/stores/message_store.dart';
 import 'package:nerimity_desktop_flutter/stores/server_member_store.dart';
 import 'package:nerimity_desktop_flutter/stores/server_roles_store.dart';
 import 'package:nerimity_desktop_flutter/stores/server_store.dart';
+import 'package:nerimity_desktop_flutter/stores/user_presence_store.dart';
 
 void handleSocketEvent(String event, dynamic payload) {
   switch (event) {
@@ -24,12 +26,14 @@ class AuthenticatedPayload {
   final List<Channel> channels;
   final List<RawServerMember> serverMembers;
   final List<ServerRole> serverRoles;
+  final List<UserPresence> presences;
 
   AuthenticatedPayload({
     required this.servers,
     required this.channels,
     required this.serverMembers,
     required this.serverRoles,
+    required this.presences,
   });
 
   factory AuthenticatedPayload.fromJson(Map<String, dynamic> json) =>
@@ -45,6 +49,9 @@ class AuthenticatedPayload {
             .toList(),
         serverRoles: (json['serverRoles'] as List)
             .map((s) => ServerRole.fromJson(s))
+            .toList(),
+        presences: (json['presences'] as List)
+            .map((s) => UserPresence.fromJson(s))
             .toList(),
       );
 }
@@ -62,6 +69,7 @@ Future<void> onUserAuthenticated(dynamic payload) async {
   channelStore.addChannels(data.channels);
   serverMemberStore.addServerMembers(data.serverMembers);
   serverRolesStore.addServerRoles(data.serverRoles);
+  userPresenceStore.addPresences(data.presences);
 }
 
 void onMessageCreated(dynamic payload) {

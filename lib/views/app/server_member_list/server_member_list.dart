@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nerimity_desktop_flutter/models/server_member.dart';
 import 'package:nerimity_desktop_flutter/models/server_role.dart';
 import 'package:nerimity_desktop_flutter/stores/server_store.dart';
+import 'package:nerimity_desktop_flutter/stores/user_presence_store.dart';
 import 'package:nerimity_desktop_flutter/stores/user_store.dart';
 import 'package:nerimity_desktop_flutter/theme/app_theme.dart';
 import 'package:nerimity_desktop_flutter/views/avatar.dart';
@@ -22,6 +23,8 @@ List<({ServerRole role, List<ServerMember> members})> _buildCategorizedMembers(
   final buckets = <String, List<ServerMember>>{};
 
   for (final member in serverMembers) {
+    final offline = !userPresenceStore.presences.containsKey(member.userId);
+    if (offline) continue;
     if (member.roleIds.isEmpty) continue;
 
     String? topRoleId;
@@ -75,6 +78,7 @@ class _ServerMemberListState extends State<ServerMemberList> with SignalsMixin {
                   RoleHeader(
                     key: ValueKey('role_${category.role.id}'),
                     id: category.role.id,
+                    count: category.members.length,
                   ),
                   for (final member in category.members)
                     MemberTile(
@@ -97,7 +101,8 @@ class _ServerMemberListState extends State<ServerMemberList> with SignalsMixin {
 
 class RoleHeader extends StatelessWidget {
   final String id;
-  const RoleHeader({super.key, required this.id});
+  final int count;
+  const RoleHeader({super.key, required this.id, required this.count});
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +135,7 @@ class RoleHeader extends StatelessWidget {
                     Transform.translate(
                       offset: Offset(0, -1),
                       child: Text(
-                        role.name,
+                        "${role.name} ($count)",
                         style: TextStyle(
                           fontSize: 12,
                           color: Theme.of(

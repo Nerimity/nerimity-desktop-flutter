@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:nerimity_desktop_flutter/services/api_client.dart';
+import 'package:nerimity_desktop_flutter/services/channel_service.dart';
 import 'package:signals/signals_flutter.dart';
 import '../models/message.dart';
 
@@ -12,11 +12,9 @@ class MessageStore {
   Future<void> loadMessages(String channelId) async {
     if (messages[channelId] != null) return;
     try {
-      final response = await dio.get('/channels/$channelId/messages');
-      final list = (response.data as List)
-          .map((m) => Message.fromJson(m))
-          .toList();
-      messages[channelId] = list;
+      final response = await fetchMessages(channelId);
+
+      messages[channelId] = response;
     } on DioException catch (e) {
       debugPrint(
         'loadMessages error: ${e.response?.statusCode} ${e.response?.data}',

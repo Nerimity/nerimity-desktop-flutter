@@ -7,6 +7,7 @@ class AppTheme {
   static ThemeData light() {
     return ThemeData(
       brightness: Brightness.light,
+      primaryColor: const Color(0xff4c93ff),
       scaffoldBackgroundColor: const Color(0xFFFFFFFF),
       textSelectionTheme: const TextSelectionThemeData(
         cursorColor: Color(0xff4c93ff),
@@ -23,6 +24,7 @@ class AppTheme {
 
   static ThemeData dark() {
     return ThemeData(
+      primaryColor: const Color(0xff4c93ff),
       brightness: Brightness.dark,
       scaffoldBackgroundColor: const Color(0xFF000000),
       textSelectionTheme: const TextSelectionThemeData(
