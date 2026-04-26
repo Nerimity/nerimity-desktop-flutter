@@ -1,14 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nerimity_desktop_flutter/services/socket_service.dart';
 import 'package:nerimity_desktop_flutter/stores/channel_store.dart';
 import 'package:nerimity_desktop_flutter/stores/server_store.dart';
+import 'package:nerimity_desktop_flutter/utils/secure_storage.dart';
 import 'package:nerimity_desktop_flutter/views/app/server_channel_list/server_channel_list.dart';
 import 'package:nerimity_desktop_flutter/views/app/server_member_list/server_member_list.dart';
 import '../app/server_list/server_list.dart';
 
-class AppShell extends StatelessWidget {
+class AppShell extends StatefulWidget {
   final Widget child;
-  const AppShell({required this.child, super.key});
+  const AppShell({super.key, required this.child});
+
+  @override
+  State<AppShell> createState() => _AppShellState();
+}
+
+class _AppShellState extends State<AppShell> {
+  @override
+  void initState() {
+    super.initState();
+    connect();
+  }
+
+  void connect() async {
+    final token = await getToken();
+    if (token != null) {
+      SocketService.instance.connect(token);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +38,7 @@ class AppShell extends StatelessWidget {
       child: Row(
         children: [
           ServerList(),
-          Expanded(child: child),
+          Expanded(child: widget.child),
         ],
       ),
     );
