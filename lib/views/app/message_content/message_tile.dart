@@ -91,7 +91,7 @@ class MessageImageEmbed extends StatelessWidget {
           width: attachment.width!.toDouble(),
           height: attachment.height!.toDouble(),
           maxWidth: constraints.maxWidth.clamp(0, 1920),
-          maxHeight: 1080,
+          maxHeight: 600,
         );
 
         return ClipRRect(

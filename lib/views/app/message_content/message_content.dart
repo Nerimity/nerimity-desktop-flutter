@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nerimity_desktop_flutter/services/channel_service.dart';
+import 'package:nerimity_desktop_flutter/stores/channel_store.dart';
 import 'package:nerimity_desktop_flutter/stores/message_store.dart';
 import 'package:nerimity_desktop_flutter/views/app/message_content/message_tile.dart';
 import 'package:nerimity_desktop_flutter/views/app_text_field.dart';
@@ -40,7 +41,6 @@ class _MessageContentState extends State<MessageContent> {
       children: [
         Expanded(child: MessageLog(channelId: widget.channelId)),
         MessageInput(
-          channelName: 'general',
           onSubmitted: (message) => postMessage(widget.channelId, message),
         ),
       ],
@@ -72,14 +72,9 @@ class MessageLog extends StatelessWidget {
 }
 
 class MessageInput extends StatefulWidget {
-  final String channelName;
   final ValueChanged<String> onSubmitted;
 
-  const MessageInput({
-    super.key,
-    required this.channelName,
-    required this.onSubmitted,
-  });
+  const MessageInput({super.key, required this.onSubmitted});
 
   @override
   State<MessageInput> createState() => _MessageInputState();
@@ -110,11 +105,13 @@ class _MessageInputState extends State<MessageInput> {
       child: Row(
         children: [
           Expanded(
-            child: AppTextField(
-              hintText: 'Send a message to ${widget.channelName}',
-              controller: _controller,
-              focusNode: _focusNode,
-              onSubmitted: _handleSubmitted,
+            child: Watch(
+              (context) => AppTextField(
+                hintText: 'Message in ${channelStore.currentChannel()?.name}',
+                controller: _controller,
+                focusNode: _focusNode,
+                onSubmitted: _handleSubmitted,
+              ),
             ),
           ),
         ],
