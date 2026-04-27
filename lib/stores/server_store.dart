@@ -55,6 +55,26 @@ class ServerStore {
     return roles;
   });
 
+  ({String? hexColor, String? icon})? memberTopColorAndIcon(
+    ServerMember? member,
+  ) {
+    if (member == null) return null;
+    final sorted = sortedRoles.value;
+
+    String? hexColor;
+    String? icon;
+
+    for (final role in sorted) {
+      if (hexColor != null && icon != null) break;
+      if (member.roleIds.contains(role.id)) {
+        if (hexColor == null && role.hexColor != null) hexColor = role.hexColor;
+        if (icon == null && role.icon != null) icon = role.icon;
+      }
+    }
+
+    return (hexColor: hexColor, icon: icon);
+  }
+
   String? memberTopColor(ServerMember? member) {
     if (member == null) return null;
     final sorted = sortedRoles.value;
