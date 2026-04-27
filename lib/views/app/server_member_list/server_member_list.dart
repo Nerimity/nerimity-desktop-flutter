@@ -9,6 +9,7 @@ import 'package:nerimity_desktop_flutter/stores/user_store.dart';
 import 'package:nerimity_desktop_flutter/theme/app_theme.dart';
 import 'package:nerimity_desktop_flutter/utils/bitwise.dart';
 import 'package:nerimity_desktop_flutter/utils/channel_permission_flag.dart';
+import 'package:nerimity_desktop_flutter/utils/colors.dart';
 import 'package:nerimity_desktop_flutter/utils/role_permission_flag.dart';
 import 'package:nerimity_desktop_flutter/views/avatar.dart';
 import 'package:nerimity_desktop_flutter/views/cdn_icon.dart';
@@ -31,8 +32,9 @@ List<({ServerRole role, List<ServerMember> members})> _buildCategorizedMembers(
   final serverRoles = serverStore.currentServerRoles.value;
 
   final defaultRole = serverStore.currentServerDefaultRole();
-  final sortedRoles = [...roles.where((r) => !r.hideRole)];
-  sortedRoles.sort((a, b) => b.order.compareTo(a.order));
+  final sortedRoles = serverStore.sortedRoles
+      .where((r) => !r.hideRole)
+      .toList();
 
   final roleOrder = <String, int>{
     for (var i = 0; i < sortedRoles.length; i++) sortedRoles[i].id: i,
@@ -224,6 +226,8 @@ class MemberTile extends StatelessWidget {
       if (member == null) return const SizedBox.shrink();
       if (user == null) return const SizedBox.shrink();
 
+      final color = serverStore.memberTopColor(member);
+
       return Padding(
         padding: EdgeInsets.only(bottom: 2.0, right: 8.0, left: 8.0),
         child: Material(
@@ -246,9 +250,13 @@ class MemberTile extends StatelessWidget {
                   children: [
                     Avatar(user: user, size: AvatarSize.md),
                     Expanded(
-                      child: Text(
+                      child: buildColoredName(
                         member.nickname ?? user.username,
-                        style: TextStyle(fontSize: 14),
+                        hexColor: color,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),

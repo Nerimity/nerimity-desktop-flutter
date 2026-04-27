@@ -3,6 +3,7 @@ class ServerRole {
   final String serverId;
   final String name;
   final bool hideRole;
+  final String? hexColor;
   final int permissions;
   final int order;
   final String? icon;
@@ -14,6 +15,7 @@ class ServerRole {
     required this.order,
     required this.hideRole,
     required this.permissions,
+    this.hexColor,
     this.icon,
   });
 
@@ -24,6 +26,7 @@ class ServerRole {
     order: json['order'] as int,
     hideRole: json['hideRole'] as bool,
     permissions: json['permissions'] as int,
+    hexColor: json['hexColor'] as String?,
     icon: json['icon'] as String?,
   );
 }

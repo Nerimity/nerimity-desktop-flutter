@@ -49,6 +49,23 @@ class ServerStore {
         return serverRolesStore.serverRoles[currentServerId.value];
       });
 
+  late final sortedRoles = computed(() {
+    final roles = currentServerRoles.value?.values.toList() ?? [];
+    roles.sort((a, b) => b.order.compareTo(a.order));
+    return roles;
+  });
+
+  String? memberTopColor(ServerMember? member) {
+    if (member == null) return null;
+    final sorted = sortedRoles.value;
+    for (final role in sorted) {
+      if (member.roleIds.contains(role.id) && role.hexColor != null) {
+        return role.hexColor;
+      }
+    }
+    return null;
+  }
+
   late final Computed<ServerRole?> currentServerDefaultRole = computed(() {
     final defaultRoleId = currentServer()?.defaultRoleId;
     return serverRolesStore.serverRoles[currentServerId.value]?[defaultRoleId];

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nerimity_desktop_flutter/models/message.dart';
+import 'package:nerimity_desktop_flutter/stores/server_store.dart';
+import 'package:nerimity_desktop_flutter/utils/colors.dart';
 import 'package:nerimity_desktop_flutter/utils/image.dart';
 import 'package:nerimity_desktop_flutter/views/avatar.dart';
 import 'package:nerimity_desktop_flutter/views/markup.dart';
@@ -14,6 +16,10 @@ class MessageTile extends StatelessWidget {
     final prevSameCreator =
         prevMessage != null &&
         prevMessage!.createdBy.id == message.createdBy.id;
+
+    final member =
+        serverStore.currentServerMembers.value?[message.createdBy.id];
+    final color = serverStore.memberTopColor(member);
 
     return Container(
       margin: !prevSameCreator
@@ -38,8 +44,9 @@ class MessageTile extends StatelessWidget {
                   children: [
                     prevSameCreator
                         ? const SizedBox.shrink()
-                        : Text(
-                            message.createdBy.username,
+                        : buildColoredName(
+                            hexColor: color,
+                            member?.nickname ?? message.createdBy.username,
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                     MarkupView(rawText: message.content, message: message),
