@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:nerimity_desktop_flutter/config.dart';
 import 'package:nerimity_desktop_flutter/models/server.dart';
 import 'package:nerimity_desktop_flutter/models/user.dart';
 import 'package:nerimity_desktop_flutter/utils/colors.dart';
@@ -29,9 +28,7 @@ class Avatar extends StatelessWidget {
     final name = server?.name ?? user?.username ?? '';
     final hexColor = server?.hexColor ?? user?.hexColor ?? '';
     final avatar = server?.avatar ?? user?.avatar;
-    final avatarUrl = avatar != null
-        ? buildImageUrl('$cdnUrl$avatar', size: 60)
-        : null;
+    final avatarUrl = avatar != null ? buildImageUrl(avatar, size: 60) : null;
 
     return Container(
       width: size.value,

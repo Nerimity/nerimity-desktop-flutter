@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:nerimity_desktop_flutter/models/message.dart';
 import 'package:nerimity_desktop_flutter/services/channel_service.dart';
 import 'package:nerimity_desktop_flutter/stores/message_store.dart';
+import 'package:nerimity_desktop_flutter/views/app/message_content/message_tile.dart';
 import 'package:nerimity_desktop_flutter/views/app_text_field.dart';
-import 'package:nerimity_desktop_flutter/views/avatar.dart';
-import 'package:nerimity_desktop_flutter/views/markup.dart';
 import 'package:signals/signals_flutter.dart';
 
 class MessageContent extends StatefulWidget {
@@ -120,56 +118,6 @@ class _MessageInputState extends State<MessageInput> {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class MessageTile extends StatelessWidget {
-  final Message message;
-  final Message? prevMessage;
-  const MessageTile({super.key, required this.message, this.prevMessage});
-
-  @override
-  Widget build(BuildContext context) {
-    final prevSameCreator =
-        prevMessage != null &&
-        prevMessage!.createdBy.id == message.createdBy.id;
-
-    return Container(
-      margin: !prevSameCreator
-          ? const EdgeInsets.only(top: 8)
-          : const EdgeInsets.only(top: 0),
-      child: InkWell(
-        onTap: () {},
-        hoverColor: const Color.fromARGB(19, 255, 255, 255),
-        child: Container(
-          padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 8,
-            children: [
-              prevSameCreator
-                  ? SizedBox(width: AvatarSize.lg.value, height: 1)
-                  : Avatar(user: message.createdBy, size: AvatarSize.lg),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-
-                  children: [
-                    prevSameCreator
-                        ? const SizedBox.shrink()
-                        : Text(
-                            message.createdBy.username,
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                    MarkupView(rawText: message.content, message: message),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

@@ -34,7 +34,7 @@ class CdnIcon extends StatelessWidget {
 
     final iconUrl = isSvgIcon
         ? unicodeToTwemojiUrl(icon)
-        : buildImageUrl('${cdnUrl}emojis/$icon', size: size.toInt());
+        : buildImageUrl('emojis/$icon', size: size.toInt());
 
     return isSvgIcon
         ? SvgPicture.network(iconUrl, width: size, height: size)

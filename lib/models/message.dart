@@ -6,12 +6,14 @@ class Message {
   final String channelId;
   final User createdBy;
   final List<User> mentions;
+  final List<Attachment> attachments;
 
   Message({
     required this.id,
     required this.content,
     required this.channelId,
     required this.createdBy,
+    required this.attachments,
     this.mentions = const [],
   });
 
@@ -21,6 +23,9 @@ class Message {
     channelId: json['channelId'],
     createdBy: User.fromJson(json['createdBy']),
     mentions: (json['mentions'] as List).map((m) => User.fromJson(m)).toList(),
+    attachments: (json['attachments'] as List)
+        .map((a) => Attachment.fromJson(a))
+        .toList(),
   );
 
   Message copyWith({String? content}) {
@@ -30,6 +35,26 @@ class Message {
       channelId: channelId,
       createdBy: createdBy,
       mentions: mentions,
+      attachments: attachments,
     );
   }
+}
+
+class Attachment {
+  final String id;
+  final String? path;
+
+  final String? mime;
+  final int? width;
+  final int? height;
+
+  Attachment({required this.id, this.path, this.mime, this.width, this.height});
+
+  factory Attachment.fromJson(Map<String, dynamic> json) => Attachment(
+    id: json['id'],
+    path: json['path'] as String?,
+    mime: json['mime'] as String?,
+    width: json['width'] as int?,
+    height: json['height'] as int?,
+  );
 }
