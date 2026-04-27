@@ -172,7 +172,7 @@ class RoleHeader extends StatelessWidget {
       if (!offlineRole && role == null) return const SizedBox.shrink();
 
       return Padding(
-        padding: EdgeInsets.only(bottom: 2.0, right: 8.0),
+        padding: EdgeInsets.only(bottom: 2.0, right: 8.0, left: 8.0),
         child: Material(
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(8),
@@ -229,7 +229,7 @@ class MemberTile extends StatelessWidget {
       if (user == null) return const SizedBox.shrink();
 
       return Padding(
-        padding: EdgeInsets.only(bottom: 2.0, right: 8.0),
+        padding: EdgeInsets.only(bottom: 2.0, right: 8.0, left: 8.0),
         child: Material(
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(8),

@@ -79,7 +79,7 @@ class _ChannelItemState extends State<ChannelItem> with SignalsMixin {
       return Padding(
         padding: EdgeInsets.only(
           bottom: 2.0,
-          left: isCategory ? 0 : 8.0,
+          left: 8.0,
           right: 8.0,
           top: isCategory ? 10 : 0,
         ),
@@ -100,9 +100,9 @@ class _ChannelItemState extends State<ChannelItem> with SignalsMixin {
               },
               highlightColor: Colors.transparent,
               child: Container(
-                padding: const EdgeInsets.symmetric(
+                padding: EdgeInsets.symmetric(
                   vertical: 6.0,
-                  horizontal: 12.0,
+                  horizontal: isCategory ? 6.0 : 12.0,
                 ),
                 child: Row(
                   spacing: 8,
