@@ -27,4 +27,12 @@ class ChannelStore {
   late final Computed<Channel?> currentChannel = computed(() {
     return channels[currentChannelId.value];
   });
+
+  late final Computed<Map<String, int>> currentPermissions = computed(() {
+    final channel = currentChannel();
+    final Map<String, int> channelPermissions = {
+      for (final p in channel?.permissions ?? []) p.roleId: p.permissions,
+    };
+    return channelPermissions;
+  });
 }

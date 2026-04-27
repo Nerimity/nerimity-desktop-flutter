@@ -18,10 +18,12 @@ class Channel {
   final String? serverId;
   final String? icon;
   final String? categoryId;
+  final List<ChannelPermission>? permissions;
 
   Channel({
     required this.id,
     required this.type,
+    this.permissions,
     this.name,
     this.serverId,
     this.icon,
@@ -38,5 +40,20 @@ class Channel {
     order: json['order'],
     icon: json['icon'],
     categoryId: json['categoryId'],
+    permissions: (json['permissions'] as List?)
+        ?.map((e) => ChannelPermission.fromJson(e))
+        .toList(),
   );
+}
+
+class ChannelPermission {
+  final int permissions;
+  final String roleId;
+  ChannelPermission({required this.permissions, required this.roleId});
+
+  factory ChannelPermission.fromJson(Map<String, dynamic> json) =>
+      ChannelPermission(
+        permissions: json['permissions'],
+        roleId: json['roleId'],
+      );
 }

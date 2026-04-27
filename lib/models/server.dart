@@ -5,6 +5,7 @@ class Server {
   final String defaultChannelId;
   final String defaultRoleId;
   final String hexColor;
+  final String createdById;
 
   Server({
     required this.id,
@@ -12,6 +13,7 @@ class Server {
     required this.hexColor,
     required this.defaultChannelId,
     required this.defaultRoleId,
+    required this.createdById,
     this.avatar,
   });
 
@@ -22,5 +24,6 @@ class Server {
     avatar: json['avatar'],
     defaultChannelId: json['defaultChannelId'],
     defaultRoleId: json['defaultRoleId'],
+    createdById: json['createdById'],
   );
 }

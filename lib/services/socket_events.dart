@@ -4,6 +4,7 @@ import 'package:nerimity_desktop_flutter/models/message.dart';
 import 'package:nerimity_desktop_flutter/models/raw_server_member.dart';
 import 'package:nerimity_desktop_flutter/models/server.dart';
 import 'package:nerimity_desktop_flutter/models/server_role.dart';
+import 'package:nerimity_desktop_flutter/models/user.dart';
 import 'package:nerimity_desktop_flutter/models/user_presence.dart';
 import 'package:nerimity_desktop_flutter/stores/channel_store.dart';
 import 'package:nerimity_desktop_flutter/stores/message_store.dart';
@@ -11,6 +12,7 @@ import 'package:nerimity_desktop_flutter/stores/server_member_store.dart';
 import 'package:nerimity_desktop_flutter/stores/server_roles_store.dart';
 import 'package:nerimity_desktop_flutter/stores/server_store.dart';
 import 'package:nerimity_desktop_flutter/stores/user_presence_store.dart';
+import 'package:nerimity_desktop_flutter/stores/user_store.dart';
 
 void handleSocketEvent(String event, dynamic payload) {
   switch (event) {
@@ -22,6 +24,7 @@ void handleSocketEvent(String event, dynamic payload) {
 }
 
 class AuthenticatedPayload {
+  final User user;
   final List<Server> servers;
   final List<Channel> channels;
   final List<RawServerMember> serverMembers;
@@ -29,6 +32,7 @@ class AuthenticatedPayload {
   final List<UserPresence> presences;
 
   AuthenticatedPayload({
+    required this.user,
     required this.servers,
     required this.channels,
     required this.serverMembers,
@@ -38,6 +42,7 @@ class AuthenticatedPayload {
 
   factory AuthenticatedPayload.fromJson(Map<String, dynamic> json) =>
       AuthenticatedPayload(
+        user: User.fromJson(json['user']),
         servers: (json['servers'] as List)
             .map((s) => Server.fromJson(s))
             .toList(),
@@ -70,6 +75,7 @@ Future<void> onUserAuthenticated(dynamic payload) async {
   serverMemberStore.addServerMembers(data.serverMembers);
   serverRolesStore.addServerRoles(data.serverRoles);
   userPresenceStore.addPresences(data.presences);
+  userStore.setCurrentUser(data.user);
 }
 
 void onMessageCreated(dynamic payload) {
