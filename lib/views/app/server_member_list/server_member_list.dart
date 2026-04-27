@@ -51,15 +51,11 @@ List<({ServerRole role, List<ServerMember> members})> _buildCategorizedMembers(
     RolePermissionFlag.admin.bit,
   );
 
-  final isCreator =
-      userStore.currentUser.value?.id ==
-      serverStore.currentServer()?.createdById;
-
-  final isDefaultPublic =
-      isCreator || hasDefaultChannelPerm || hasDefaultRolePerm;
+  final isDefaultPublic = hasDefaultChannelPerm || hasDefaultRolePerm;
 
   for (final member in serverMembers) {
-    var canViewChannel = isDefaultPublic;
+    final isCreator = member.userId == serverStore.currentServer()?.createdById;
+    var canViewChannel = isCreator || isDefaultPublic;
 
     String? topRoleId;
     int? bestIndex;
