@@ -247,7 +247,7 @@ class MemberTile extends StatelessWidget {
                     Avatar(user: user, size: AvatarSize.md),
                     Expanded(
                       child: Text(
-                        user.username,
+                        member.nickname ?? user.username,
                         style: TextStyle(fontSize: 14),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,

@@ -24,6 +24,7 @@ class ServerMemberStore {
           userId: raw.userId,
           serverId: raw.serverId,
           roleIds: raw.roleIds,
+          nickname: raw.nickname,
         );
         _getOrCreate(raw.serverId)[raw.userId] = member;
       }

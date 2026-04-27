@@ -5,6 +5,7 @@ class RawServerMember {
   final String userId;
   final String serverId;
   final User user;
+  final String? nickname;
   final Set<String> roleIds;
 
   RawServerMember({
@@ -13,6 +14,7 @@ class RawServerMember {
     required this.serverId,
     required this.user,
     required this.roleIds,
+    this.nickname,
   });
 
   factory RawServerMember.fromJson(Map<String, dynamic> json) =>
@@ -22,5 +24,6 @@ class RawServerMember {
         serverId: json['serverId'] as String,
         user: User.fromJson(json['user']),
         roleIds: Set<String>.from(json['roleIds'] as List),
+        nickname: json['nickname'] as String?,
       );
 }
