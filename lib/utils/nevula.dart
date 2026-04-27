@@ -167,7 +167,7 @@ final Map<String, String> tokenParts = {
   'escape': r'\\[\\*/_~`\[\]]',
   'bold': r'\*\*',
   'underline': r'__',
-  'italic': r'(?:_|\*|\/\/)',
+  'italic': r'(?:\*|\/\/|(?<!\w)_|_(?!\w))',
   'strikethrough': r'~~',
   'codeblock': r'```',
   'code': r'`?`',
