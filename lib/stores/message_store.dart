@@ -34,4 +34,24 @@ class MessageStore {
         ? updated.sublist(updated.length - 100)
         : updated;
   }
+
+  void updateMessage(
+    String channelId,
+    String messageId,
+    Map<String, dynamic> partial,
+  ) {
+    final current = messages[channelId];
+    if (current == null) return;
+    final index = current.indexWhere((m) => m.id == messageId);
+    if (index == -1) return;
+    final updated = List<Message>.from(current);
+    updated[index] = current[index].copyWith(content: partial['content']);
+    messages[channelId] = updated;
+  }
+
+  void removeMessage(String channelId, String messageId) {
+    final current = messages[channelId];
+    if (current == null) return;
+    messages[channelId] = current.where((m) => m.id != messageId).toList();
+  }
 }

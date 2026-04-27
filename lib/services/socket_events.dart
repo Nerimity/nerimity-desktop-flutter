@@ -20,6 +20,10 @@ void handleSocketEvent(String event, dynamic payload) {
       onUserAuthenticated(payload);
     case 'message:created':
       onMessageCreated(payload);
+    case 'message:updated':
+      onMessageUpdated(payload);
+    case 'message:deleted':
+      onMessageDeleted(payload);
   }
 }
 
@@ -81,4 +85,16 @@ Future<void> onUserAuthenticated(dynamic payload) async {
 void onMessageCreated(dynamic payload) {
   final message = Message.fromJson(payload["message"]);
   messageStore.addMessage(message.channelId, message);
+}
+
+void onMessageUpdated(dynamic payload) {
+  messageStore.updateMessage(
+    payload["channelId"],
+    payload["messageId"],
+    payload["updated"],
+  );
+}
+
+void onMessageDeleted(dynamic payload) {
+  messageStore.removeMessage(payload["channelId"], payload["messageId"]);
 }

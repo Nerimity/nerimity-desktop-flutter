@@ -22,4 +22,14 @@ class Message {
     createdBy: User.fromJson(json['createdBy']),
     mentions: (json['mentions'] as List).map((m) => User.fromJson(m)).toList(),
   );
+
+  Message copyWith({String? content}) {
+    return Message(
+      id: id,
+      content: content ?? this.content,
+      channelId: channelId,
+      createdBy: createdBy,
+      mentions: mentions,
+    );
+  }
 }
