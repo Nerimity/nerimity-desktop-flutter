@@ -9,6 +9,7 @@ import 'package:nerimity_desktop_flutter/utils/image.dart';
 class CdnIcon extends StatelessWidget {
   final Channel? channel;
   final ServerRole? serverRole;
+  final String? path;
   final double size;
   final IconData? fallbackIcon;
   const CdnIcon({
@@ -16,12 +17,13 @@ class CdnIcon extends StatelessWidget {
     this.channel,
     this.fallbackIcon,
     this.serverRole,
+    this.path,
     required this.size,
   });
 
   @override
   Widget build(BuildContext context) {
-    final icon = channel?.icon ?? serverRole?.icon;
+    final icon = channel?.icon ?? serverRole?.icon ?? path;
     if (icon == null) {
       if (fallbackIcon != null) {
         return Icon(fallbackIcon, size: size);

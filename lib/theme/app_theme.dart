@@ -25,6 +25,7 @@ class AppTheme {
   static ThemeData dark() {
     return ThemeData(
       primaryColor: const Color(0xff4c93ff),
+
       brightness: Brightness.dark,
       scaffoldBackgroundColor: const Color(0xFF000000),
       textSelectionTheme: const TextSelectionThemeData(

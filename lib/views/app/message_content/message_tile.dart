@@ -3,6 +3,7 @@ import 'package:nerimity_desktop_flutter/models/message.dart';
 import 'package:nerimity_desktop_flutter/stores/server_store.dart';
 import 'package:nerimity_desktop_flutter/utils/colors.dart';
 import 'package:nerimity_desktop_flutter/utils/image.dart';
+import 'package:nerimity_desktop_flutter/views/app/server_clan_tag.dart';
 import 'package:nerimity_desktop_flutter/views/avatar.dart';
 import 'package:nerimity_desktop_flutter/views/markup.dart';
 
@@ -20,6 +21,8 @@ class MessageTile extends StatelessWidget {
     final member =
         serverStore.currentServerMembers.value?[message.createdBy.id];
     final color = serverStore.memberTopColor(member);
+
+    final clan = message.createdBy.profile?.clan;
 
     return Container(
       margin: !prevSameCreator
@@ -42,13 +45,18 @@ class MessageTile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
 
                   children: [
-                    prevSameCreator
-                        ? const SizedBox.shrink()
-                        : buildColoredName(
+                    if (prevSameCreator != true)
+                      Row(
+                        spacing: 4,
+                        children: [
+                          buildColoredName(
                             hexColor: color,
                             member?.nickname ?? message.createdBy.username,
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
+                          if (clan != null) ServerClanTag(clan: clan),
+                        ],
+                      ),
                     MarkupView(rawText: message.content, message: message),
                     MessageEmbeds(message: message),
                   ],

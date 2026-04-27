@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:nerimity_desktop_flutter/models/channel.dart';
 import 'package:nerimity_desktop_flutter/models/server_member.dart';
 import 'package:nerimity_desktop_flutter/models/server_role.dart';
 import 'package:nerimity_desktop_flutter/stores/channel_store.dart';
@@ -11,6 +10,7 @@ import 'package:nerimity_desktop_flutter/utils/bitwise.dart';
 import 'package:nerimity_desktop_flutter/utils/channel_permission_flag.dart';
 import 'package:nerimity_desktop_flutter/utils/colors.dart';
 import 'package:nerimity_desktop_flutter/utils/role_permission_flag.dart';
+import 'package:nerimity_desktop_flutter/views/app/server_clan_tag.dart';
 import 'package:nerimity_desktop_flutter/views/avatar.dart';
 import 'package:nerimity_desktop_flutter/views/cdn_icon.dart';
 import 'package:signals/signals_flutter.dart';
@@ -227,6 +227,7 @@ class MemberTile extends StatelessWidget {
       if (user == null) return const SizedBox.shrink();
 
       final color = serverStore.memberTopColor(member);
+      final clan = user.profile?.clan;
 
       return Padding(
         padding: EdgeInsets.only(bottom: 2.0, right: 8.0, left: 8.0),
@@ -250,15 +251,23 @@ class MemberTile extends StatelessWidget {
                   children: [
                     Avatar(user: user, size: AvatarSize.md),
                     Expanded(
-                      child: buildColoredName(
-                        member.nickname ?? user.username,
-                        hexColor: color,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
+                      child: Row(
+                        spacing: 2,
+                        children: [
+                          Flexible(
+                            child: buildColoredName(
+                              member.nickname ?? user.username,
+                              hexColor: color,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
+                          if (clan != null) ServerClanTag(clan: clan),
+                        ],
                       ),
                     ),
                   ],

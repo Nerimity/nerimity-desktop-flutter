@@ -27,3 +27,17 @@ class Server {
     createdById: json['createdById'],
   );
 }
+
+class ServerClan {
+  final String serverId;
+  final String icon;
+  final String tag;
+
+  ServerClan({required this.serverId, required this.icon, required this.tag});
+
+  factory ServerClan.fromJson(Map<String, dynamic> json) => ServerClan(
+    serverId: json['serverId'],
+    icon: json['icon'],
+    tag: json['tag'],
+  );
+}
