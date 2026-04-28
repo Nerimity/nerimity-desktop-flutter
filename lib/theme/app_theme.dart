@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class AppTheme {
   static const Color itemSelectedBg = Color(0x9942464c);
   static const Color itemHoveredBg = Color(0x6642464c);
+  static const Color alertColor = Color(0xffeb6e6e);
 
   static ThemeData light() {
     return ThemeData(

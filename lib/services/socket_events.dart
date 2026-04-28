@@ -1,12 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:nerimity_desktop_flutter/models/channel.dart';
 import 'package:nerimity_desktop_flutter/models/message.dart';
+import 'package:nerimity_desktop_flutter/models/message_mention.dart';
 import 'package:nerimity_desktop_flutter/models/raw_server_member.dart';
 import 'package:nerimity_desktop_flutter/models/server.dart';
 import 'package:nerimity_desktop_flutter/models/server_role.dart';
 import 'package:nerimity_desktop_flutter/models/user.dart';
 import 'package:nerimity_desktop_flutter/models/user_presence.dart';
 import 'package:nerimity_desktop_flutter/stores/channel_store.dart';
+import 'package:nerimity_desktop_flutter/stores/message_mention_store.dart';
 import 'package:nerimity_desktop_flutter/stores/message_store.dart';
 import 'package:nerimity_desktop_flutter/stores/server_member_store.dart';
 import 'package:nerimity_desktop_flutter/stores/server_roles_store.dart';
@@ -34,6 +36,8 @@ class AuthenticatedPayload {
   final List<RawServerMember> serverMembers;
   final List<ServerRole> serverRoles;
   final List<UserPresence> presences;
+  final List<MessageMention> messageMentions;
+  final Map<String, int> lastSeenServerChannelIds;
 
   AuthenticatedPayload({
     required this.user,
@@ -42,6 +46,8 @@ class AuthenticatedPayload {
     required this.serverMembers,
     required this.serverRoles,
     required this.presences,
+    required this.messageMentions,
+    required this.lastSeenServerChannelIds,
   });
 
   factory AuthenticatedPayload.fromJson(Map<String, dynamic> json) =>
@@ -62,6 +68,12 @@ class AuthenticatedPayload {
         presences: (json['presences'] as List)
             .map((s) => UserPresence.fromJson(s))
             .toList(),
+        messageMentions: (json['messageMentions'] as List)
+            .map((s) => MessageMention.fromJson(s))
+            .toList(),
+        lastSeenServerChannelIds: Map<String, int>.from(
+          json['lastSeenServerChannelIds'],
+        ),
       );
 }
 
@@ -76,10 +88,12 @@ Future<void> onUserAuthenticated(dynamic payload) async {
   );
   serverStore.addServers(data.servers);
   channelStore.addChannels(data.channels);
+  channelStore.setLastSeenServerChannelIds(data.lastSeenServerChannelIds);
   serverMemberStore.addServerMembers(data.serverMembers);
   serverRolesStore.addServerRoles(data.serverRoles);
   userPresenceStore.addPresences(data.presences);
   userStore.setCurrentUser(data.user);
+  messageMentionStore.setMentions(data.messageMentions);
 }
 
 void onMessageCreated(dynamic payload) {

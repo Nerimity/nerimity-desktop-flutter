@@ -90,4 +90,26 @@ class ServerStore {
     final defaultRoleId = currentServer()?.defaultRoleId;
     return serverRolesStore.serverRoles[currentServerId.value]?[defaultRoleId];
   });
+
+  late final Computed<Map<String, int>> notifications = computed(() {
+    final notifications = channelStore.channelNotifications.value;
+    final channelMap = channelStore.channels.value;
+    final Map<String, int> result = {};
+
+    for (final entry in notifications.entries) {
+      final channel = channelMap[entry.key];
+      if (channel?.serverId == null) continue;
+
+      final serverId = channel!.serverId!;
+      final current = result[serverId] ?? 0;
+
+      if (entry.value > 0) {
+        result[serverId] = (current < 0 ? 0 : current) + entry.value;
+      } else if (entry.value == -1 && current == 0) {
+        result[serverId] = -1;
+      }
+    }
+
+    return result;
+  });
 }

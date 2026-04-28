@@ -18,6 +18,7 @@ class Channel {
   final String? serverId;
   final String? icon;
   final String? categoryId;
+  final int? lastMessagedAt;
   final List<ChannelPermission>? permissions;
 
   Channel({
@@ -29,6 +30,7 @@ class Channel {
     this.icon,
     this.order,
     this.categoryId,
+    this.lastMessagedAt,
   });
 
   factory Channel.fromJson(Map<String, dynamic> json) => Channel(
@@ -43,6 +45,7 @@ class Channel {
     permissions: (json['permissions'] as List?)
         ?.map((e) => ChannelPermission.fromJson(e))
         .toList(),
+    lastMessagedAt: json['lastMessagedAt'] as int?,
   );
 }
 
