@@ -19,6 +19,12 @@ class MessageTile extends StatelessWidget {
         prevMessage != null &&
         prevMessage!.createdBy.id == message.createdBy.id;
 
+    final isUnderFiveMinutes = prevMessage == null
+        ? true
+        : message.createdAt - prevMessage!.createdAt < 5 * 60 * 1000;
+
+    final hideExtraDetails = prevSameCreator && isUnderFiveMinutes;
+
     final member =
         serverStore.currentServerMembers.value?[message.createdBy.id];
     final topcolorAndIcon = serverStore.memberTopColorAndIcon(member);
@@ -26,8 +32,8 @@ class MessageTile extends StatelessWidget {
     final clan = message.createdBy.profile?.clan;
 
     return Container(
-      margin: !prevSameCreator
-          ? const EdgeInsets.only(top: 8)
+      margin: !hideExtraDetails
+          ? const EdgeInsets.only(top: 12.0)
           : const EdgeInsets.only(top: 0),
       child: InkWell(
         onTap: () {},
@@ -38,7 +44,7 @@ class MessageTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 8,
             children: [
-              prevSameCreator
+              hideExtraDetails
                   ? SizedBox(width: AvatarSize.lg.value, height: 1)
                   : Avatar(user: message.createdBy, size: AvatarSize.lg),
               Expanded(
@@ -46,7 +52,7 @@ class MessageTile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
 
                   children: [
-                    if (!prevSameCreator)
+                    if (!hideExtraDetails)
                       Row(
                         spacing: 4,
                         children: [
