@@ -7,6 +7,7 @@ class Message {
   final User createdBy;
   final List<User> mentions;
   final List<Attachment> attachments;
+  final int createdAt;
 
   Message({
     required this.id,
@@ -14,6 +15,7 @@ class Message {
     required this.channelId,
     required this.createdBy,
     required this.attachments,
+    required this.createdAt,
     this.mentions = const [],
   });
 
@@ -21,6 +23,7 @@ class Message {
     id: json['id'],
     content: json['content'],
     channelId: json['channelId'],
+    createdAt: json['createdAt'] as int,
     createdBy: User.fromJson(json['createdBy']),
     mentions: (json['mentions'] as List).map((m) => User.fromJson(m)).toList(),
     attachments: (json['attachments'] as List)
@@ -36,6 +39,7 @@ class Message {
       createdBy: createdBy,
       mentions: mentions,
       attachments: attachments,
+      createdAt: createdAt,
     );
   }
 }

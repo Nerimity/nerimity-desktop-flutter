@@ -16,6 +16,11 @@ class ChannelStore {
     lastSeenServerChannelIds.addAll(ids);
   }
 
+  void updateLastSeenServerChannel(String channelId) {
+    lastSeenServerChannelIds[channelId] =
+        DateTime.now().millisecondsSinceEpoch + 10;
+  }
+
   void addChannels(List<Channel> list) {
     channels.addAll({for (final c in list) c.id: c});
   }
@@ -30,6 +35,12 @@ class ChannelStore {
 
   void setCurrentChannelId(String? id) {
     currentChannelId.value = id;
+  }
+
+  void updateLastMessagedAt(String channelId, int lastMessagedAt) {
+    final channel = channels[channelId];
+    if (channel == null) return;
+    channels[channelId] = channel.copyWith(lastMessagedAt: lastMessagedAt);
   }
 
   late final Computed<Channel?> currentChannel = computed(() {

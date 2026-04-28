@@ -47,6 +47,20 @@ class Channel {
         .toList(),
     lastMessagedAt: json['lastMessagedAt'] as int?,
   );
+
+  Channel copyWith({int? lastMessagedAt}) {
+    return Channel(
+      id: id,
+      type: type,
+      name: name,
+      serverId: serverId,
+      order: order,
+      icon: icon,
+      categoryId: categoryId,
+      permissions: permissions,
+      lastMessagedAt: lastMessagedAt ?? this.lastMessagedAt,
+    );
+  }
 }
 
 class ChannelPermission {

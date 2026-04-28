@@ -26,6 +26,8 @@ void handleSocketEvent(String event, dynamic payload) {
       onMessageUpdated(payload);
     case 'message:deleted':
       onMessageDeleted(payload);
+    case 'notification:dismissed':
+      onNotificationDismissed(payload);
   }
 }
 
@@ -98,6 +100,11 @@ Future<void> onUserAuthenticated(dynamic payload) async {
 
 void onMessageCreated(dynamic payload) {
   final message = Message.fromJson(payload["message"]);
+  final channel = channelStore.channels[message.channelId];
+  final createdByMe = message.createdBy.id == userStore.currentUser.value?.id;
+  if (channel != null && !createdByMe) {
+    channelStore.updateLastMessagedAt(message.channelId, message.createdAt);
+  }
   messageStore.addMessage(message.channelId, message);
 }
 
@@ -111,4 +118,8 @@ void onMessageUpdated(dynamic payload) {
 
 void onMessageDeleted(dynamic payload) {
   messageStore.removeMessage(payload["channelId"], payload["messageId"]);
+}
+
+void onNotificationDismissed(dynamic payload) {
+  channelStore.updateLastSeenServerChannel(payload["channelId"]);
 }
