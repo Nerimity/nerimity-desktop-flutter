@@ -253,6 +253,7 @@ class MemberTile extends StatelessWidget {
                     Expanded(
                       child: Row(
                         spacing: 2,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Flexible(
                             child: buildColoredName(

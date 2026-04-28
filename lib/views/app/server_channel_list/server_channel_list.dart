@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nerimity_desktop_flutter/models/channel.dart';
 import 'package:nerimity_desktop_flutter/stores/channel_store.dart';
+import 'package:nerimity_desktop_flutter/stores/drawer_store.dart';
 import 'package:nerimity_desktop_flutter/stores/server_store.dart';
 import 'package:nerimity_desktop_flutter/theme/app_theme.dart';
 import 'package:nerimity_desktop_flutter/views/cdn_icon.dart';
@@ -104,6 +105,7 @@ class _ChannelItemState extends State<ChannelItem> with SignalsMixin {
                   borderRadius: BorderRadius.circular(8),
                   onHover: (hovering) => _isHovered.value = hovering,
                   onTap: () {
+                    drawer.opened.value = null;
                     context.go(
                       '/app/servers/${channel.serverId}/${channel.id}',
                     );

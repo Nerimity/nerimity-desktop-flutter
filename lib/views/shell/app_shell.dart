@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nerimity_desktop_flutter/services/socket_service.dart';
 import 'package:nerimity_desktop_flutter/stores/channel_store.dart';
+import 'package:nerimity_desktop_flutter/stores/drawer_store.dart';
+import 'package:nerimity_desktop_flutter/stores/media_query_store.dart';
 import 'package:nerimity_desktop_flutter/stores/server_store.dart';
 import 'package:nerimity_desktop_flutter/utils/secure_storage.dart';
 import 'package:nerimity_desktop_flutter/views/app/server_channel_list/server_channel_list.dart';
 import 'package:nerimity_desktop_flutter/views/app/server_member_list/server_member_list.dart';
+import 'package:signals/signals_flutter.dart';
 import '../app/server_list/server_list.dart';
 
 class AppShell extends StatefulWidget {
@@ -32,16 +35,19 @@ class _AppShellState extends State<AppShell> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).colorScheme.surfaceContainerHigh,
+    return Watch((context) {
+      return Material(
+        color: Theme.of(context).colorScheme.surfaceContainerHigh,
 
-      child: Row(
-        children: [
-          ServerList(),
-          Expanded(child: widget.child),
-        ],
-      ),
-    );
+        child: Row(
+          children: [
+            if (!isMobile.value || drawer.opened.value == DrawerSide.left)
+              ServerList(),
+            Expanded(child: widget.child),
+          ],
+        ),
+      );
+    });
   }
 }
 
@@ -77,13 +83,83 @@ class _ChatLayoutState extends State<ChatLayout> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).colorScheme.surfaceContainerHigh,
+    return Watch((context) {
+      return Material(
+        color: Theme.of(context).colorScheme.surfaceContainerHigh,
+        child: Row(
+          children: [
+            if (!isMobile.value || drawer.opened.value == DrawerSide.left)
+              ServerChannelList(),
+            Expanded(
+              child: Column(
+                children: [
+                  Header(),
+                  if (!isMobile.value || drawer.opened.value == null)
+                    Expanded(child: widget.child),
+                ],
+              ),
+            ),
+            if (!isMobile.value || drawer.opened.value == DrawerSide.right)
+              ServerMemberList(),
+          ],
+        ),
+      );
+    });
+  }
+}
+
+class Header extends StatelessWidget {
+  const Header({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 50,
+      color: Theme.of(context).colorScheme.surfaceContainer,
+      padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          ServerChannelList(),
-          Expanded(child: widget.child),
-          ServerMemberList(),
+          Ink(
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(999)),
+            child: Material(
+              borderRadius: BorderRadius.circular(999),
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(999),
+                onTap: () {
+                  drawer.toggle(DrawerSide.left);
+                },
+                child: Container(
+                  padding: EdgeInsets.all(4),
+                  child: Icon(
+                    Icons.menu,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Ink(
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(999)),
+            child: Material(
+              borderRadius: BorderRadius.circular(999),
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(999),
+                onTap: () {
+                  drawer.toggle(DrawerSide.right);
+                },
+                child: Container(
+                  padding: EdgeInsets.all(4),
+                  child: Icon(
+                    Icons.menu,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );

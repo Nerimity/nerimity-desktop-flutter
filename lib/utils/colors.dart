@@ -110,14 +110,16 @@ Widget buildColoredName(
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          ShaderMask(
-            shaderCallback: (bounds) => result.gradient!.createShader(bounds),
-            blendMode: BlendMode.srcIn,
-            child: Text(
-              text,
-              style: effectiveStyle.copyWith(color: Colors.white),
-              overflow: overflow,
-              maxLines: maxLines,
+          Flexible(
+            child: ShaderMask(
+              shaderCallback: (bounds) => result.gradient!.createShader(bounds),
+              blendMode: BlendMode.srcIn,
+              child: Text(
+                text,
+                style: effectiveStyle.copyWith(color: Colors.white),
+                overflow: overflow,
+                maxLines: maxLines,
+              ),
             ),
           ),
         ],
