@@ -23,8 +23,7 @@ jobs:
         run: flutter config --enable-web
 
       - name: Build Web (WASM)
-        run: flutter build web
-        # run: flutter build web --wasm
+        run: flutter build web --wasm
 
       - name: Zip The Build
         uses: vimtor/action-zip@v1
