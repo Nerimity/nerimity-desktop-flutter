@@ -3,6 +3,7 @@ import 'package:nerimity_desktop_flutter/models/message.dart';
 import 'package:nerimity_desktop_flutter/stores/server_store.dart';
 import 'package:nerimity_desktop_flutter/utils/colors.dart';
 import 'package:nerimity_desktop_flutter/utils/image.dart';
+import 'package:nerimity_desktop_flutter/utils/url.dart';
 import 'package:nerimity_desktop_flutter/views/app/server_clan_tag.dart';
 import 'package:nerimity_desktop_flutter/views/avatar.dart';
 import 'package:nerimity_desktop_flutter/views/cdn_icon.dart';
@@ -30,6 +31,11 @@ class MessageTile extends StatelessWidget {
     final topcolorAndIcon = serverStore.memberTopColorAndIcon(member);
 
     final clan = message.createdBy.profile?.clan;
+
+    final isImageEmbedOnly =
+        message.embed?.type == EmbedType.image.name &&
+        !message.content.contains(" ") &&
+        isValidUrl(message.content);
 
     return Container(
       margin: !hideExtraDetails
@@ -66,7 +72,8 @@ class MessageTile extends StatelessWidget {
                             CdnIcon(path: topcolorAndIcon!.icon, size: 12),
                         ],
                       ),
-                    MarkupView(rawText: message.content, message: message),
+                    if (!isImageEmbedOnly && message.content.isNotEmpty)
+                      MarkupView(rawText: message.content, message: message),
                     MessageEmbeds(message: message),
                   ],
                 ),
@@ -91,29 +98,57 @@ class MessageEmbeds extends StatelessWidget {
         attachment?.width != null &&
         attachment?.mime?.startsWith("image/") == true;
 
-    return imageAttachment
-        ? MessageImageEmbed(attachment: attachment!, message: message)
+    final imageEmbed =
+        message.embed?.type == EmbedType.image.name &&
+        message.embed?.imageHeight != null;
+
+    return (imageAttachment || imageEmbed)
+        ? MessageImageEmbed(
+            attachment: attachment,
+            embed: message.embed,
+            message: message,
+          )
         : const SizedBox.shrink();
   }
 }
 
 class MessageImageEmbed extends StatelessWidget {
   final Message message;
-  final Attachment attachment;
+  final Attachment? attachment;
+  final Embed? embed;
   const MessageImageEmbed({
     super.key,
     required this.message,
-    required this.attachment,
+    this.attachment,
+    this.embed,
   });
 
   @override
   Widget build(BuildContext context) {
-    final url = buildImageUrl(attachment.path!);
+    var path = "";
+
+    if (attachment?.path != null) {
+      path = attachment!.path!;
+    } else {
+      final unsafeUrl = embed?.imageUrl as String;
+      if (unsafeUrl.startsWith("https://") || unsafeUrl.startsWith("http://")) {
+        path = unsafeUrl;
+      } else {
+        path = "https://$unsafeUrl";
+      }
+      path = "proxy/${Uri.encodeComponent(path)}/embed.webp";
+    }
+
+    final url = buildImageUrl(path);
+
+    final width = attachment?.width ?? embed?.imageWidth ?? 0;
+    final height = attachment?.height ?? embed?.imageHeight ?? 0;
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final size = constrainDimensions(
-          width: attachment.width!.toDouble(),
-          height: attachment.height!.toDouble(),
+          width: width.toDouble(),
+          height: height.toDouble(),
           maxWidth: constraints.maxWidth.clamp(0, 1920),
           maxHeight: 600,
         );
@@ -125,6 +160,17 @@ class MessageImageEmbed extends StatelessWidget {
             width: size.width,
             height: size.height,
             fit: BoxFit.cover,
+            frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+              if (wasSynchronouslyLoaded) {
+                return child;
+              }
+              return AnimatedOpacity(
+                opacity: frame == null ? 0.0 : 1.0,
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeIn,
+                child: child,
+              );
+            },
           ),
         );
       },

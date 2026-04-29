@@ -45,7 +45,7 @@ class MessageStore {
     final index = current.indexWhere((m) => m.id == messageId);
     if (index == -1) return;
     final updated = List<Message>.from(current);
-    updated[index] = current[index].copyWith(content: partial['content']);
+    updated[index] = current[index].copyWith(partial);
     messages[channelId] = updated;
   }
 
