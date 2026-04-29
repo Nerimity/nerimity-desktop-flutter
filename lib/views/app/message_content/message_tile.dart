@@ -136,7 +136,8 @@ class MessageImageEmbed extends StatelessWidget {
       } else {
         path = "https://$unsafeUrl";
       }
-      path = "proxy/${Uri.encodeComponent(path)}/embed.webp";
+      path =
+          "proxy/${Uri.encodeComponent(path)}/embed.webp${embed!.animated as bool ? '?type=webp' : ''}";
     }
 
     final url = buildImageUrl(path);
