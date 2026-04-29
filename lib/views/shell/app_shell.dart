@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:nerimity_desktop_flutter/services/socket_service.dart';
 import 'package:nerimity_desktop_flutter/stores/channel_store.dart';
 import 'package:nerimity_desktop_flutter/stores/drawer_store.dart';
@@ -133,7 +134,7 @@ class Header extends StatelessWidget {
                 child: Container(
                   padding: EdgeInsets.all(4),
                   child: Icon(
-                    Icons.menu,
+                    Symbols.menu,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
@@ -153,7 +154,7 @@ class Header extends StatelessWidget {
                 child: Container(
                   padding: EdgeInsets.all(4),
                   child: Icon(
-                    Icons.menu,
+                    Symbols.menu,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),

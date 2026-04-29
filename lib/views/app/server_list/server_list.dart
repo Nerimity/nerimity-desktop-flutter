@@ -30,7 +30,7 @@ class _ServerListState extends State<ServerList> with SignalsMixin {
       child: Column(
         children: [
           // IconButton(
-          //   icon: const Icon(Icons.brightness_6),
+          //   icon: const Icon(Symbols.brightness_6),
           //   onPressed: toggleTheme,
           //   iconSize: 10,
           // ),

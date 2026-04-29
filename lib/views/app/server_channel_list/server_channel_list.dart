@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:nerimity_desktop_flutter/models/channel.dart';
 import 'package:nerimity_desktop_flutter/stores/channel_store.dart';
 import 'package:nerimity_desktop_flutter/stores/drawer_store.dart';
@@ -120,9 +121,9 @@ class _ChannelItemState extends State<ChannelItem> with SignalsMixin {
                       spacing: 8,
                       children: [
                         if (isCategory)
-                          Icon(Icons.keyboard_arrow_down, size: 10),
+                          Icon(Symbols.keyboard_arrow_down_rounded, size: 10),
                         CdnIcon(
-                          fallbackIcon: Icons.tag,
+                          fallbackIcon: Symbols.tag_rounded,
                           channel: channel,
                           size: channel.type == ChannelType.category.value
                               ? 12

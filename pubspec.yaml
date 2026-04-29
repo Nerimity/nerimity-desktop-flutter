@@ -13,6 +13,7 @@ dependencies:
   flutter_secure_storage: ^10.0.0
   flutter_svg: ^2.2.4
   go_router: ^17.2.1
+  material_symbols_icons: ^4.2928.1
   signals: ^6.3.0
   web_socket_channel: ^3.0.3
 

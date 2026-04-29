@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:nerimity_desktop_flutter/models/channel.dart';
 import 'package:nerimity_desktop_flutter/models/message.dart';
 import 'package:nerimity_desktop_flutter/models/user.dart';
@@ -74,7 +75,10 @@ TextSpan channelMention(Channel channel) {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             spacing: 4,
-            children: [Icon(Icons.tag, size: 14), Text(channel.name!)],
+            children: [
+              Icon(Symbols.tag_rounded, size: 14),
+              Text(channel.name!),
+            ],
           ),
         ),
       ),
