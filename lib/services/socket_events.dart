@@ -20,6 +20,8 @@ void handleSocketEvent(String event, dynamic payload) {
   switch (event) {
     case 'user:authenticated':
       onUserAuthenticated(payload);
+    case 'user:presence_update':
+      onUserPresenceUpdate(payload);
     case 'message:created':
       onMessageCreated(payload);
     case 'message:updated':
@@ -122,4 +124,10 @@ void onMessageDeleted(dynamic payload) {
 
 void onNotificationDismissed(dynamic payload) {
   channelStore.updateLastSeenServerChannel(payload["channelId"]);
+}
+
+void onUserPresenceUpdate(dynamic payload) {
+  if (payload["status"] != null) {
+    userPresenceStore.updatePresence(payload["userId"], payload);
+  }
 }

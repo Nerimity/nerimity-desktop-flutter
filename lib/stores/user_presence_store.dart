@@ -13,4 +13,15 @@ class UserPresenceStore {
   void addPresence(UserPresence presence) {
     presences[presence.userId] = presence;
   }
+
+  void updatePresence(String userId, Map<String, dynamic> payload) {
+    if (payload["status"] != null && payload["status"] == 0) {
+      presences.remove(userId);
+    } else {
+      presences[userId] = UserPresence(
+        userId: userId,
+        status: payload["status"],
+      );
+    }
+  }
 }

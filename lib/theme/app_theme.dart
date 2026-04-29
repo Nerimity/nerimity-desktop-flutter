@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
+  static const Color primaryColor = Color(0xff4c93ff);
+  static const Color alertColor = Color(0xffeb6e6e);
+  static const Color successColor = Color(0xff78e380);
+  static const Color warnColor = Color(0xffff8f2c);
+  static const Color disabledColor = Color(0xffadadad);
   static const Color itemSelectedBg = Color(0x9942464c);
   static const Color itemHoveredBg = Color(0x6642464c);
-  static const Color alertColor = Color(0xffeb6e6e);
 
   static ThemeData light() {
     return ThemeData(

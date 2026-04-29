@@ -11,6 +11,7 @@ import 'package:nerimity_desktop_flutter/utils/channel_permission_flag.dart';
 import 'package:nerimity_desktop_flutter/utils/colors.dart';
 import 'package:nerimity_desktop_flutter/utils/role_permission_flag.dart';
 import 'package:nerimity_desktop_flutter/views/app/server_clan_tag.dart';
+import 'package:nerimity_desktop_flutter/views/app/user_presence.dart';
 import 'package:nerimity_desktop_flutter/views/avatar.dart';
 import 'package:nerimity_desktop_flutter/views/cdn_icon.dart';
 import 'package:signals/signals_flutter.dart';
@@ -251,23 +252,29 @@ class MemberTile extends StatelessWidget {
                   children: [
                     Avatar(user: user, size: AvatarSize.md),
                     Expanded(
-                      child: Row(
-                        spacing: 2,
+                      child: Column(
                         mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Flexible(
-                            child: buildColoredName(
-                              member.nickname ?? user.username,
-                              hexColor: color,
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
+                          Row(
+                            spacing: 2,
+                            children: [
+                              Flexible(
+                                child: buildColoredName(
+                                  member.nickname ?? user.username,
+                                  hexColor: color,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
                               ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                            ),
+                              if (clan != null) ServerClanTag(clan: clan),
+                            ],
                           ),
-                          if (clan != null) ServerClanTag(clan: clan),
+                          UserPresence(userId: user.id, showOffline: false),
                         ],
                       ),
                     ),
