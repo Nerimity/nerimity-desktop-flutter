@@ -74,10 +74,7 @@ TextSpan channelMention(Channel channel) {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             spacing: 4,
-            children: [
-              Icon(Icons.tag, size: 14),
-              Text(channel.name!),
-            ],
+            children: [Icon(Icons.tag, size: 14), Text(channel.name!)],
           ),
         ),
       ),
@@ -128,10 +125,7 @@ TextSpan buildTextSpan(Entity entity, String fullText, Message? message) {
     case "named_link":
       return TextSpan(
         text: entity.type == "named_link" ? entity.params["name"] : content,
-        style: const TextStyle(
-          color: Colors.blue,
-          decoration: TextDecoration.underline,
-        ),
+        style: const TextStyle(color: Colors.blue),
       );
     case "color":
       final colorStr = entity.params["color"] as String;
@@ -158,15 +152,17 @@ TextSpan buildTextSpan(Entity entity, String fullText, Message? message) {
         ),
       );
     case "heading":
+      const levelSizes = {1: 34.0, 2: 24.0, 3: 18.0, 4: 14.0, 5: 12.0, 6: 10.0};
+
       final int level = entity.params["level"] ?? 1;
-      double fontSize = (36 - (level * 4)).toDouble();
+      double fontSize = levelSizes[level] ?? 14.0;
 
       return TextSpan(
         children: [
           const WidgetSpan(child: SizedBox(height: 20)),
           TextSpan(
             children: children,
-            style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w600),
           ),
         ],
       );
@@ -193,8 +189,6 @@ class MarkupView extends StatelessWidget {
 
     Entity fullEntityTree = addTextSpans(rootEntity);
 
-    return Text.rich(
-      buildTextSpan(fullEntityTree, rawText ?? '', message),
-    );
+    return Text.rich(buildTextSpan(fullEntityTree, rawText ?? '', message));
   }
 }
