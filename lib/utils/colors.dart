@@ -70,6 +70,15 @@ convertShorthandToLinearGradient(String shorthand) {
 }
 
 Color parseHexColor(String hex) {
+  switch (hex.toLowerCase()) {
+    case 'white':
+      return Colors.white;
+    case 'black':
+      return Colors.black;
+    case 'red':
+      return Colors.red;
+  }
+
   var h = hex.replaceFirst('#', '');
   if (h.length == 3) h = h.split('').map((c) => '$c$c').join();
   return Color(int.parse('FF$h', radix: 16));

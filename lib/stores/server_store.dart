@@ -72,6 +72,9 @@ class ServerStore {
       }
     }
 
+    hexColor ??= currentServerDefaultRole.value?.hexColor;
+    icon ??= currentServerDefaultRole.value?.icon;
+
     return (hexColor: hexColor, icon: icon);
   }
 
@@ -83,7 +86,8 @@ class ServerStore {
         return role.hexColor;
       }
     }
-    return null;
+
+    return currentServerDefaultRole.value?.hexColor;
   }
 
   late final Computed<ServerRole?> currentServerDefaultRole = computed(() {

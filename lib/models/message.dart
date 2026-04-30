@@ -9,6 +9,7 @@ class Message {
   final List<Attachment> attachments;
   final int createdAt;
   final Embed? embed;
+  final List<ReplyMessage> replyMessages;
 
   Message({
     required this.id,
@@ -19,6 +20,7 @@ class Message {
     required this.createdAt,
     this.embed,
     this.mentions = const [],
+    this.replyMessages = const [],
   });
 
   factory Message.fromJson(Map<String, dynamic> json) => Message(
@@ -31,6 +33,9 @@ class Message {
     embed: json['embed'] != null ? Embed.fromJson(json['embed']) : null,
     attachments: (json['attachments'] as List)
         .map((a) => Attachment.fromJson(a))
+        .toList(),
+    replyMessages: (json['replyMessages'] as List? ?? [])
+        .map((r) => ReplyMessage.fromJson(r))
         .toList(),
   );
 
@@ -46,6 +51,7 @@ class Message {
       embed: partial.containsKey("embed")
           ? (partial["embed"] != null ? Embed.fromJson(partial["embed"]) : null)
           : embed,
+      replyMessages: replyMessages,
     );
   }
 }
@@ -103,5 +109,44 @@ class Embed {
     imageMime: json['imageMime'] as String?,
     imageUrl: json['imageUrl'] as String?,
     domain: json['domain'] as String?,
+  );
+}
+
+class ReplyMessage {
+  final PartialMessage? replyToMessage;
+
+  ReplyMessage({this.replyToMessage});
+
+  factory ReplyMessage.fromJson(Map<String, dynamic> json) => ReplyMessage(
+    replyToMessage: json['replyToMessage'] != null
+        ? PartialMessage.fromJson(json['replyToMessage'])
+        : null,
+  );
+}
+
+// used for replies
+class PartialMessage {
+  final String id;
+  final String content;
+  final int createdAt;
+  final User createdBy;
+  final List<Attachment> attachments;
+
+  PartialMessage({
+    required this.id,
+    required this.content,
+    required this.createdAt,
+    required this.createdBy,
+    required this.attachments,
+  });
+
+  factory PartialMessage.fromJson(Map<String, dynamic> json) => PartialMessage(
+    id: json['id'],
+    content: json['content'],
+    createdAt: json['createdAt'] as int,
+    createdBy: User.fromJson(json['createdBy']),
+    attachments: (json['attachments'] as List? ?? [])
+        .map((a) => Attachment.fromJson(a))
+        .toList(),
   );
 }

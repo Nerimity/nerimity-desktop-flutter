@@ -24,7 +24,10 @@ class MessageTile extends StatelessWidget {
         ? true
         : message.createdAt - prevMessage!.createdAt < 5 * 60 * 1000;
 
-    final hideExtraDetails = prevSameCreator && isUnderFiveMinutes;
+    final hasMessageReplies = message.replyMessages.isNotEmpty;
+
+    final hideExtraDetails =
+        prevSameCreator && isUnderFiveMinutes && !hasMessageReplies;
 
     final member =
         serverStore.currentServerMembers.value?[message.createdBy.id];
@@ -46,37 +49,47 @@ class MessageTile extends StatelessWidget {
         hoverColor: const Color.fromARGB(19, 255, 255, 255),
         child: Container(
           padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-          child: Row(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 8,
-            children: [
-              hideExtraDetails
-                  ? SizedBox(width: AvatarSize.lg.value, height: 1)
-                  : Avatar(user: message.createdBy, size: AvatarSize.lg),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
 
-                  children: [
-                    if (!hideExtraDetails)
-                      Row(
-                        spacing: 4,
-                        children: [
-                          buildColoredName(
-                            hexColor: topcolorAndIcon?.hexColor,
-                            member?.nickname ?? message.createdBy.username,
-                            style: TextStyle(fontWeight: FontWeight.bold),
+            children: [
+              if (hasMessageReplies) MessageReplies(message: message),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 8,
+                children: [
+                  hideExtraDetails
+                      ? SizedBox(width: AvatarSize.lg.value, height: 1)
+                      : Avatar(user: message.createdBy, size: AvatarSize.lg),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+
+                      children: [
+                        if (!hideExtraDetails)
+                          Row(
+                            spacing: 4,
+                            children: [
+                              buildColoredName(
+                                hexColor: topcolorAndIcon?.hexColor,
+                                member?.nickname ?? message.createdBy.username,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              if (clan != null) ServerClanTag(clan: clan),
+                              if (topcolorAndIcon?.icon != null)
+                                CdnIcon(path: topcolorAndIcon!.icon, size: 12),
+                            ],
                           ),
-                          if (clan != null) ServerClanTag(clan: clan),
-                          if (topcolorAndIcon?.icon != null)
-                            CdnIcon(path: topcolorAndIcon!.icon, size: 12),
-                        ],
-                      ),
-                    if (!isImageEmbedOnly && message.content.isNotEmpty)
-                      MarkupView(rawText: message.content, message: message),
-                    MessageEmbeds(message: message),
-                  ],
-                ),
+                        if (!isImageEmbedOnly && message.content.isNotEmpty)
+                          MarkupView(
+                            rawText: message.content,
+                            message: message,
+                          ),
+                        MessageEmbeds(message: message),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -175,6 +188,88 @@ class MessageImageEmbed extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class MessageReplies extends StatelessWidget {
+  final Message message;
+  const MessageReplies({super.key, required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    final replies = message.replyMessages;
+    return Opacity(
+      opacity: 0.8,
+      child: Container(
+        padding: EdgeInsets.only(bottom: 8),
+        child: IntrinsicHeight(
+          child: Row(
+            spacing: 8,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(
+                width: AvatarSize.lg.value - 18,
+                margin: EdgeInsets.only(left: 18, top: 10),
+                decoration: BoxDecoration(
+                  border: Border(
+                    top: BorderSide(color: Colors.white30, width: 2),
+                    left: BorderSide(color: Colors.white30, width: 2),
+                  ),
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(6)),
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: replies
+                      .map(
+                        (reply) =>
+                            MessageReplyTile(message: reply.replyToMessage),
+                      )
+                      .toList(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class MessageReplyTile extends StatelessWidget {
+  final PartialMessage? message;
+  const MessageReplyTile({super.key, this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    final member =
+        serverStore.currentServerMembers.value?[message?.createdBy.id];
+
+    final topColor = serverStore.memberTopColor(member);
+
+    var content = message?.content ?? "";
+    if (message == null) content = "Deleted Message";
+    if ((message?.attachments.isNotEmpty ?? false) && content.isEmpty) {
+      content = "Attachment Message";
+    }
+
+    return Row(
+      spacing: 6,
+      children: [
+        if (message?.createdBy != null)
+          buildColoredName(
+            hexColor: topColor,
+            member?.nickname ?? message!.createdBy.username,
+            style: TextStyle(),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        Flexible(
+          child: Text(content, maxLines: 1, overflow: TextOverflow.ellipsis),
+        ),
+      ],
     );
   }
 }
