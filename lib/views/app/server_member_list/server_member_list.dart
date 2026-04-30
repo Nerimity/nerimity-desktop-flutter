@@ -132,23 +132,36 @@ class _ServerMemberListState extends State<ServerMemberList> with SignalsMixin {
         children: [
           Expanded(
             child: Watch((context) {
-              final items = [
-                for (final category in _categorizedServerMembers.value) ...[
-                  RoleHeader(
-                    key: ValueKey('role_${category.role.id}'),
+              final categories = _categorizedServerMembers.value;
+
+              final items = <({String type, String id, int count})>[
+                for (final category in categories) ...[
+                  (
+                    type: 'role',
                     id: category.role.id,
                     count: category.members.length,
                   ),
                   for (final member in category.members)
-                    MemberTile(
-                      key: ValueKey('member_${member.userId}'),
-                      id: member.userId,
-                    ),
+                    (type: 'member', id: member.userId, count: 0),
                 ],
               ];
+
               return ListView.builder(
                 itemCount: items.length,
-                itemBuilder: (ctx, i) => items[i],
+                itemBuilder: (ctx, i) {
+                  final item = items[i];
+                  if (item.type == 'role') {
+                    return RoleHeader(
+                      key: ValueKey('role_${item.id}'),
+                      id: item.id,
+                      count: item.count,
+                    );
+                  }
+                  return MemberTile(
+                    key: ValueKey('member_${item.id}'),
+                    id: item.id,
+                  );
+                },
               );
             }),
           ),
