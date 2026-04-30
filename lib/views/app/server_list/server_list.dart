@@ -50,100 +50,120 @@ class _ServerListState extends State<ServerList> with SignalsMixin {
   }
 }
 
-class ServerItem extends StatelessWidget {
+class ServerItem extends StatefulWidget {
   final String id;
   const ServerItem({required this.id, super.key});
 
   @override
+  State<ServerItem> createState() => _ServerItemState();
+}
+
+class _ServerItemState extends State<ServerItem> {
+  bool _hovered = false;
+
+  @override
   Widget build(BuildContext context) {
     return Watch((context) {
-      final server = serverStore.servers[id];
+      final server = serverStore.servers[widget.id];
       if (server == null) return const SizedBox.shrink();
 
-      final isSelected = serverStore.currentServerId.value == id;
+      final isSelected = serverStore.currentServerId.value == widget.id;
 
-      final notification = serverStore.notifications[id];
+      final notification = serverStore.notifications[widget.id];
 
-      return Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 2.0, left: 2.0, right: 2.0),
-            child: Material(
-              borderRadius: BorderRadius.circular(8),
-              color: Colors.transparent,
-              child: Ink(
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? AppTheme.itemSelectedBg
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(8),
-                  onTap: () =>
-                      context.go('/app/servers/$id/${server.defaultChannelId}'),
-                  child: Center(
-                    child: Avatar(server: server, size: AvatarSize.lg),
-                  ),
-                ),
+      return MouseRegion(
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(
+                bottom: 2.0,
+                left: 2.0,
+                right: 2.0,
               ),
-            ),
-          ),
-          if (notification != null && notification > 0)
-            Positioned(
-              top: 8,
-              right: 8,
-              child: IgnorePointer(
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 2,
+              child: Material(
+                borderRadius: BorderRadius.circular(8),
+                color: Colors.transparent,
+                child: Ink(
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? AppTheme.itemSelectedBg
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(8),
+                    onTap: () => context.go(
+                      '/app/servers/${widget.id}/${server.defaultChannelId}',
                     ),
-                    decoration: BoxDecoration(
-                      color: AppTheme.alertColor,
-                      borderRadius: BorderRadius.circular(99),
-                    ),
-                    constraints: const BoxConstraints(minWidth: 18),
-                    child: Text(
-                      '$notification',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
+                    child: Center(
+                      child: Avatar(
+                        server: server,
+                        size: AvatarSize.lg,
+                        animate: _hovered,
                       ),
-                      textAlign: TextAlign.center,
                     ),
                   ),
                 ),
               ),
             ),
-
-          if (isSelected || notification != null)
-            Positioned(
-              top: 0,
-              bottom: 0,
-              left: 2,
-              child: IgnorePointer(
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: Container(
-                    width: 3,
-                    height: 14,
-
-                    decoration: BoxDecoration(
-                      color: notification != null
-                          ? AppTheme.alertColor
-                          : Theme.of(context).primaryColor,
-                      borderRadius: BorderRadius.circular(999),
+            if (notification != null && notification > 0)
+              Positioned(
+                top: 8,
+                right: 8,
+                child: IgnorePointer(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppTheme.alertColor,
+                        borderRadius: BorderRadius.circular(99),
+                      ),
+                      constraints: const BoxConstraints(minWidth: 18),
+                      child: Text(
+                        '$notification',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-        ],
+
+            if (isSelected || notification != null)
+              Positioned(
+                top: 0,
+                bottom: 0,
+                left: 2,
+                child: IgnorePointer(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Container(
+                      width: 3,
+                      height: 14,
+
+                      decoration: BoxDecoration(
+                        color: notification != null
+                            ? AppTheme.alertColor
+                            : Theme.of(context).primaryColor,
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
       );
     });
   }

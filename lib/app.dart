@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:nerimity_desktop_flutter/utils/theme_notifier.dart';
 import 'package:nerimity_desktop_flutter/views/media_query_observer.dart';
+import 'package:nerimity_desktop_flutter/views/mouse_observer.dart';
+import 'package:nerimity_desktop_flutter/views/window_focus_observer.dart';
 import 'theme/app_theme.dart';
 import './router.dart';
 
@@ -18,7 +20,9 @@ class MainApp extends StatelessWidget {
           theme: AppTheme.light(),
           darkTheme: AppTheme.dark(),
           routerConfig: router,
-          builder: (context, child) => MediaQueryObserver(child: child!),
+          builder: (context, child) => FocusObserver(
+            child: MouseObserver(child: MediaQueryObserver(child: child!)),
+          ),
         );
       },
     );

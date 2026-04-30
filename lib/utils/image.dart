@@ -1,17 +1,25 @@
 import 'package:nerimity_desktop_flutter/config.dart';
 
-String buildImageUrl(String url, {int? size}) {
+String buildImageUrl(
+  String url, {
+  int? size,
+  bool? animate,
+  bool? forceIsAnimated,
+}) {
   final uri = Uri.parse("$cdnUrl$url");
 
   final endsWithGif = uri.path.endsWith('.gif');
   final endsWithHashA = uri.fragment == 'a';
-  final isAnimated = endsWithGif || endsWithHashA;
+  final isAnimated = endsWithGif || endsWithHashA || forceIsAnimated == true;
 
   if (!isAnimated && size == null) return uri.toString();
 
   final newParams = Map<String, String>.from(uri.queryParameters);
 
-  if (isAnimated) newParams['type'] = 'webp';
+  if (isAnimated && animate == null || animate == false) {
+    newParams['type'] = 'webp';
+  }
+
   if (size != null) newParams['size'] = size.toString();
 
   return uri.replace(queryParameters: newParams).toString();

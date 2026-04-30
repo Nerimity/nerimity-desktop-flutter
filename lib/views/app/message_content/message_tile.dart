@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nerimity_desktop_flutter/models/message.dart';
 import 'package:nerimity_desktop_flutter/stores/server_store.dart';
+import 'package:nerimity_desktop_flutter/stores/window_focus_store.dart';
 import 'package:nerimity_desktop_flutter/utils/colors.dart';
 import 'package:nerimity_desktop_flutter/utils/image.dart';
 import 'package:nerimity_desktop_flutter/utils/url.dart';
@@ -8,6 +9,7 @@ import 'package:nerimity_desktop_flutter/views/app/server_clan_tag.dart';
 import 'package:nerimity_desktop_flutter/views/avatar.dart';
 import 'package:nerimity_desktop_flutter/views/cdn_icon.dart';
 import 'package:nerimity_desktop_flutter/views/markup.dart';
+import 'package:signals/signals_flutter.dart';
 
 class MessageTile extends StatelessWidget {
   final Message message;
@@ -149,46 +151,50 @@ class MessageImageEmbed extends StatelessWidget {
       } else {
         path = "https://$unsafeUrl";
       }
-      path =
-          "proxy/${Uri.encodeComponent(path)}/embed.webp${embed!.animated as bool ? '?type=webp' : ''}";
+      path = "proxy/${Uri.encodeComponent(path)}/embed.webp";
     }
-
-    final url = buildImageUrl(path);
 
     final width = attachment?.width ?? embed?.imageWidth ?? 0;
     final height = attachment?.height ?? embed?.imageHeight ?? 0;
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final size = constrainDimensions(
-          width: width.toDouble(),
-          height: height.toDouble(),
-          maxWidth: constraints.maxWidth.clamp(0, 1920),
-          maxHeight: 600,
-        );
+    return Watch((context) {
+      final url = buildImageUrl(
+        path,
+        forceIsAnimated: embed?.animated,
+        animate: isWindowFocused.value,
+      );
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          final size = constrainDimensions(
+            width: width.toDouble(),
+            height: height.toDouble(),
+            maxWidth: constraints.maxWidth.clamp(0, 1920),
+            maxHeight: 600,
+          );
 
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: Image.network(
-            url,
-            width: size.width,
-            height: size.height,
-            fit: BoxFit.cover,
-            frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-              if (wasSynchronouslyLoaded) {
-                return child;
-              }
-              return AnimatedOpacity(
-                opacity: frame == null ? 0.0 : 1.0,
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.easeIn,
-                child: child,
-              );
-            },
-          ),
-        );
-      },
-    );
+          return ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.network(
+              url,
+              width: size.width,
+              height: size.height,
+              fit: BoxFit.cover,
+              frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                if (wasSynchronouslyLoaded) {
+                  return child;
+                }
+                return AnimatedOpacity(
+                  opacity: frame == null ? 0.0 : 1.0,
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeIn,
+                  child: child,
+                );
+              },
+            ),
+          );
+        },
+      );
+    });
   }
 }
 
