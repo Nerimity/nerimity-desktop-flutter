@@ -28,7 +28,8 @@ class Avatar extends StatelessWidget {
     final name = server?.name ?? user?.username ?? '';
     final hexColor = server?.hexColor ?? user?.hexColor ?? '';
     final avatar = server?.avatar ?? user?.avatar;
-    final avatarUrl = avatar != null ? buildImageUrl(avatar, size: 60) : null;
+    final avatarExists = avatar != null && avatar.trim() != '';
+    final avatarUrl = avatarExists ? buildImageUrl(avatar, size: 60) : null;
 
     return Container(
       width: size.value,
@@ -54,6 +55,8 @@ class Avatar extends StatelessWidget {
                 fit: BoxFit.cover,
                 width: size.value,
                 height: size.value,
+                errorBuilder: (context, error, stackTrace) =>
+                    SizedBox(height: size.value, width: size.value),
               ),
             ),
     );
