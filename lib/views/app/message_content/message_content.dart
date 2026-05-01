@@ -49,16 +49,9 @@ class _MessageContentState extends State<MessageContent> {
   }
 }
 
-class MessageLog extends StatefulWidget {
+class MessageLog extends StatelessWidget {
   final String channelId;
   const MessageLog({required this.channelId, super.key});
-
-  @override
-  State<MessageLog> createState() => _MessageLogState();
-}
-
-class _MessageLogState extends State<MessageLog> {
-  bool _isDragging = false;
 
   @override
   Widget build(BuildContext context) {
@@ -69,15 +62,8 @@ class _MessageLogState extends State<MessageLog> {
           paneHeight.value = constraints.maxHeight;
         });
         return Watch((context) {
-          final messages = messageStore.messages[widget.channelId] ?? [];
-          return Listener(
-            onPointerDown: (_) => _isDragging = false,
-            onPointerMove: (_) => _isDragging = true,
-            onPointerUp: (_) {
-              if (!_isDragging) {
-                FocusScope.of(context).unfocus();
-              }
-            },
+          final messages = messageStore.messages[channelId] ?? [];
+          return ExcludeFocus(
             child: ListView.builder(
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.manual,
               reverse: true,
@@ -111,6 +97,20 @@ class MessageInput extends StatefulWidget {
 class _MessageInputState extends State<MessageInput> {
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    print('INIT!');
+
+    _focusNode.addListener(() {
+      print('focus changed: hasFocus=${_focusNode.hasFocus}');
+
+      if (!_focusNode.hasFocus) {
+        Future.microtask(() => _focusNode.requestFocus());
+      }
+    });
+  }
 
   @override
   void dispose() {
