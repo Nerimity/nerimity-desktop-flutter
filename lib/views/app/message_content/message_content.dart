@@ -49,9 +49,16 @@ class _MessageContentState extends State<MessageContent> {
   }
 }
 
-class MessageLog extends StatelessWidget {
+class MessageLog extends StatefulWidget {
   final String channelId;
   const MessageLog({required this.channelId, super.key});
+
+  @override
+  State<MessageLog> createState() => _MessageLogState();
+}
+
+class _MessageLogState extends State<MessageLog> {
+  bool _isDragging = false;
 
   @override
   Widget build(BuildContext context) {
@@ -62,20 +69,29 @@ class MessageLog extends StatelessWidget {
           paneHeight.value = constraints.maxHeight;
         });
         return Watch((context) {
-          final messages = messageStore.messages[channelId] ?? [];
-          return ListView.builder(
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.manual,
-            reverse: true,
-            itemCount: messages.length,
-            itemBuilder: (ctx, i) {
-              final reversedIndex = messages.length - 1 - i;
-              return MessageTile(
-                message: messages[reversedIndex],
-                prevMessage: reversedIndex > 0
-                    ? messages[reversedIndex - 1]
-                    : null,
-              );
+          final messages = messageStore.messages[widget.channelId] ?? [];
+          return Listener(
+            onPointerDown: (_) => _isDragging = false,
+            onPointerMove: (_) => _isDragging = true,
+            onPointerUp: (_) {
+              if (!_isDragging) {
+                FocusScope.of(context).unfocus();
+              }
             },
+            child: ListView.builder(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.manual,
+              reverse: true,
+              itemCount: messages.length,
+              itemBuilder: (ctx, i) {
+                final reversedIndex = messages.length - 1 - i;
+                return MessageTile(
+                  message: messages[reversedIndex],
+                  prevMessage: reversedIndex > 0
+                      ? messages[reversedIndex - 1]
+                      : null,
+                );
+              },
+            ),
           );
         });
       },
