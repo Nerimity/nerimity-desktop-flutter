@@ -21,7 +21,15 @@ class MainApp extends StatelessWidget {
           darkTheme: AppTheme.dark(),
           routerConfig: router,
           builder: (context, child) => FocusObserver(
-            child: MouseObserver(child: MediaQueryObserver(child: child!)),
+            child: MouseObserver(
+              child: MediaQueryObserver(
+                child: Scaffold(
+                  resizeToAvoidBottomInset: true,
+                  backgroundColor: Colors.transparent,
+                  body: child!,
+                ),
+              ),
+            ),
           ),
         );
       },
