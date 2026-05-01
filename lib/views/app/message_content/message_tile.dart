@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nerimity_desktop_flutter/models/message.dart';
+import 'package:nerimity_desktop_flutter/stores/pane_size_store.dart';
 import 'package:nerimity_desktop_flutter/stores/server_store.dart';
 import 'package:nerimity_desktop_flutter/stores/window_focus_store.dart';
 import 'package:nerimity_desktop_flutter/utils/colors.dart';
@@ -166,21 +167,35 @@ class MessageImageEmbed extends StatelessWidget {
     final width = attachment?.width ?? embed?.imageWidth ?? 0;
     final height = attachment?.height ?? embed?.imageHeight ?? 0;
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final size = constrainDimensions(
-          width: width.toDouble(),
-          height: height.toDouble(),
-          maxWidth: constraints.maxWidth.clamp(0, 1920),
-          maxHeight: 600,
-        );
-        return Watch((context) {
-          final url = buildImageUrl(
-            path,
-            forceIsAnimated: embed?.animated,
-            animate: isWindowFocused.value,
-          );
-          return ClipRRect(
+    return Watch((context) {
+      final avatarOffset =
+          AvatarSize.lg.value +
+          8 +
+          8 +
+          8; // avatar + spacing + left/right padding
+      final maxWidth = (paneWidth.value - avatarOffset).clamp(0, 1920);
+      final maxHeight = (paneHeight.value / 2).clamp(0, 600);
+
+      final size = constrainDimensions(
+        width: width.toDouble(),
+        height: height.toDouble(),
+        maxWidth: maxWidth.toDouble(),
+        maxHeight: maxHeight.toDouble(),
+      );
+
+      final url = buildImageUrl(
+        path,
+        forceIsAnimated: embed?.animated,
+        animate: isWindowFocused.value,
+      );
+
+      return UnconstrainedBox(
+        clipBehavior: Clip.hardEdge,
+        alignment: Alignment.centerLeft,
+        child: SizedBox(
+          width: size.width,
+          height: size.height,
+          child: ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: Image.network(
               url,
@@ -188,9 +203,7 @@ class MessageImageEmbed extends StatelessWidget {
               height: size.height,
               fit: BoxFit.cover,
               frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-                if (wasSynchronouslyLoaded) {
-                  return child;
-                }
+                if (wasSynchronouslyLoaded) return child;
                 return AnimatedOpacity(
                   opacity: frame == null ? 0.0 : 1.0,
                   duration: const Duration(milliseconds: 200),
@@ -199,10 +212,10 @@ class MessageImageEmbed extends StatelessWidget {
                 );
               },
             ),
-          );
-        });
-      },
-    );
+          ),
+        ),
+      );
+    });
   }
 }
 
@@ -219,7 +232,6 @@ class MessageReplies extends StatelessWidget {
         padding: const EdgeInsets.only(bottom: 8),
         child: Stack(
           children: [
-            // Decorative line — positioned to stretch full height
             Positioned(
               left: 18,
               top: 10,
@@ -239,7 +251,6 @@ class MessageReplies extends StatelessWidget {
                 ),
               ),
             ),
-            // Replies content — padded to not overlap the line
             Padding(
               padding: EdgeInsets.only(left: AvatarSize.lg.value + 8),
               child: Column(

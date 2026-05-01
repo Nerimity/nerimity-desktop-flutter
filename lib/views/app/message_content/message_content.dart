@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nerimity_desktop_flutter/services/channel_service.dart';
 import 'package:nerimity_desktop_flutter/stores/channel_store.dart';
 import 'package:nerimity_desktop_flutter/stores/message_store.dart';
+import 'package:nerimity_desktop_flutter/stores/pane_size_store.dart';
 import 'package:nerimity_desktop_flutter/views/app/message_content/message_tile.dart';
 import 'package:nerimity_desktop_flutter/views/app_text_field.dart';
 import 'package:signals/signals_flutter.dart';
@@ -54,20 +55,30 @@ class MessageLog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Watch((context) {
-      final messages = messageStore.messages[channelId] ?? [];
-      return ListView.builder(
-        reverse: true,
-        itemCount: messages.length,
-        itemBuilder: (ctx, i) {
-          final reversedIndex = messages.length - 1 - i;
-          return MessageTile(
-            message: messages[reversedIndex],
-            prevMessage: reversedIndex > 0 ? messages[reversedIndex - 1] : null,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        Future.microtask(() {
+          paneWidth.value = constraints.maxWidth;
+          paneHeight.value = constraints.maxHeight;
+        });
+        return Watch((context) {
+          final messages = messageStore.messages[channelId] ?? [];
+          return ListView.builder(
+            reverse: true,
+            itemCount: messages.length,
+            itemBuilder: (ctx, i) {
+              final reversedIndex = messages.length - 1 - i;
+              return MessageTile(
+                message: messages[reversedIndex],
+                prevMessage: reversedIndex > 0
+                    ? messages[reversedIndex - 1]
+                    : null,
+              );
+            },
           );
-        },
-      );
-    });
+        });
+      },
+    );
   }
 }
 
