@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nerimity_desktop_flutter/models/server.dart';
 import 'package:nerimity_desktop_flutter/models/user.dart';
-import 'package:nerimity_desktop_flutter/stores/window_focus_store.dart';
 import 'package:nerimity_desktop_flutter/utils/colors.dart';
 import 'package:nerimity_desktop_flutter/utils/image.dart';
 import 'package:signals/signals_flutter.dart';
