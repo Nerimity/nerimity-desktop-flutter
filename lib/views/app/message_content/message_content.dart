@@ -7,6 +7,8 @@ import 'package:nerimity_desktop_flutter/views/app/message_content/message_tile.
 import 'package:nerimity_desktop_flutter/views/app_text_field.dart';
 import 'package:signals/signals_flutter.dart';
 
+bool _isScrolling = false;
+
 class MessageContent extends StatefulWidget {
   final String serverId;
   final String channelId;
@@ -63,7 +65,13 @@ class MessageLog extends StatelessWidget {
         });
         return Watch((context) {
           final messages = messageStore.messages[channelId] ?? [];
-          return ExcludeFocus(
+          return Listener(
+            onPointerDown: (_) => _isScrolling = false,
+            onPointerMove: (_) => _isScrolling = true,
+            onPointerUp: (_) => Future.delayed(
+              const Duration(milliseconds: 100),
+              () => _isScrolling = false,
+            ),
             child: ListView.builder(
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.manual,
               reverse: true,
@@ -101,13 +109,21 @@ class _MessageInputState extends State<MessageInput> {
   @override
   void initState() {
     super.initState();
-    print('INIT!');
+    bool ignoreNextFocusChange = false;
 
     _focusNode.addListener(() {
-      print('focus changed: hasFocus=${_focusNode.hasFocus}');
-
+      if (ignoreNextFocusChange) {
+        ignoreNextFocusChange = false;
+        return;
+      }
       if (!_focusNode.hasFocus) {
-        Future.microtask(() => _focusNode.requestFocus());
+        _focusNode.requestFocus();
+        Future.delayed(const Duration(milliseconds: 50), () {
+          if (!_isScrolling) {
+            ignoreNextFocusChange = true;
+            _focusNode.unfocus();
+          }
+        });
       }
     });
   }
