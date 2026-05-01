@@ -64,6 +64,7 @@ class MessageLog extends StatelessWidget {
         return Watch((context) {
           final messages = messageStore.messages[channelId] ?? [];
           return ListView.builder(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.manual,
             reverse: true,
             itemCount: messages.length,
             itemBuilder: (ctx, i) {
