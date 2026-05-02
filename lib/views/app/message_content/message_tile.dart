@@ -4,6 +4,7 @@ import 'package:nerimity_desktop_flutter/stores/pane_size_store.dart';
 import 'package:nerimity_desktop_flutter/stores/server_store.dart';
 import 'package:nerimity_desktop_flutter/stores/window_focus_store.dart';
 import 'package:nerimity_desktop_flutter/utils/colors.dart';
+import 'package:nerimity_desktop_flutter/utils/date.dart';
 import 'package:nerimity_desktop_flutter/utils/image.dart';
 import 'package:nerimity_desktop_flutter/utils/url.dart';
 import 'package:nerimity_desktop_flutter/views/app/server_clan_tag.dart';
@@ -89,6 +90,16 @@ class MessageTile extends StatelessWidget {
                                     path: topcolorAndIcon!.icon,
                                     size: 12,
                                   ),
+                                Text(
+                                  formatTimestamp(message.createdAt),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.6),
+                                  ),
+                                ),
                               ],
                             );
                           }),
