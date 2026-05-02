@@ -7,7 +7,6 @@ import 'package:nerimity_desktop_flutter/views/app/message_content/message_tile.
 import 'package:nerimity_desktop_flutter/views/app_text_field.dart';
 import 'package:signals/signals_flutter.dart';
 
-bool _isScrolling = false;
 Offset? _pointerDownPosition;
 
 class MessageContent extends StatefulWidget {
@@ -25,10 +24,20 @@ class MessageContent extends StatefulWidget {
 }
 
 class _MessageContentState extends State<MessageContent> {
+  final TextEditingController inputController = TextEditingController();
+  final FocusNode inputFocusNode = FocusNode();
+
   @override
   void initState() {
     super.initState();
     messageStore.loadMessages(widget.channelId);
+  }
+
+  @override
+  void dispose() {
+    inputController.dispose();
+    inputFocusNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -43,8 +52,16 @@ class _MessageContentState extends State<MessageContent> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Expanded(child: MessageLog(channelId: widget.channelId)),
+        Expanded(
+          child: MessageLog(
+            channelId: widget.channelId,
+            inputController: inputController,
+            inputFocusNode: inputFocusNode,
+          ),
+        ),
         MessageInput(
+          controller: inputController,
+          focusNode: inputFocusNode,
           onSubmitted: (message) => postMessage(widget.channelId, message),
         ),
       ],
@@ -54,7 +71,14 @@ class _MessageContentState extends State<MessageContent> {
 
 class MessageLog extends StatelessWidget {
   final String channelId;
-  const MessageLog({required this.channelId, super.key});
+  final TextEditingController inputController;
+  final FocusNode inputFocusNode;
+  const MessageLog({
+    required this.channelId,
+    super.key,
+    required this.inputController,
+    required this.inputFocusNode,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -68,19 +92,24 @@ class MessageLog extends StatelessWidget {
           final messages = messageStore.messages[channelId] ?? [];
           return Listener(
             onPointerDown: (e) {
-              _isScrolling = false;
               _pointerDownPosition = e.position;
+              if (!inputFocusNode.hasFocus) return;
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                inputFocusNode.requestFocus();
+                final previousSelection = inputController.selection;
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  inputController.selection = previousSelection;
+                });
+              });
             },
-            onPointerMove: (e) {
-              if (_pointerDownPosition != null) {
-                final delta = (e.position - _pointerDownPosition!).distance;
-                if (delta >= 10) _isScrolling = true;
+
+            onPointerUp: (e) {
+              if (_pointerDownPosition == null) return;
+              final delta = (e.position - _pointerDownPosition!).distance;
+              if (delta < 15) {
+                inputFocusNode.unfocus();
               }
             },
-            onPointerUp: (_) => Future.delayed(
-              const Duration(milliseconds: 100),
-              () => _isScrolling = false,
-            ),
             child: ListView.builder(
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.manual,
               reverse: true,
@@ -104,55 +133,26 @@ class MessageLog extends StatelessWidget {
 
 class MessageInput extends StatefulWidget {
   final ValueChanged<String> onSubmitted;
+  final TextEditingController controller;
+  final FocusNode focusNode;
 
-  const MessageInput({super.key, required this.onSubmitted});
+  const MessageInput({
+    super.key,
+    required this.onSubmitted,
+    required this.controller,
+    required this.focusNode,
+  });
 
   @override
   State<MessageInput> createState() => _MessageInputState();
 }
 
 class _MessageInputState extends State<MessageInput> {
-  final TextEditingController _controller = TextEditingController();
-  final FocusNode _focusNode = FocusNode();
-
-  @override
-  void initState() {
-    super.initState();
-    bool ignoreNextFocusChange = false;
-
-    _focusNode.addListener(() {
-      if (ignoreNextFocusChange) {
-        ignoreNextFocusChange = false;
-        return;
-      }
-      if (!_focusNode.hasFocus) {
-        _focusNode.requestFocus();
-        final previousSelection = _controller.selection;
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _controller.selection = previousSelection;
-        });
-        Future.delayed(const Duration(milliseconds: 50), () {
-          if (!_isScrolling) {
-            ignoreNextFocusChange = true;
-            _focusNode.unfocus();
-          }
-        });
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    _focusNode.dispose();
-    super.dispose();
-  }
-
   void _handleSubmitted(String value) {
-    _focusNode.requestFocus();
+    widget.focusNode.requestFocus();
     if (value.trim().isEmpty) return;
     widget.onSubmitted(value);
-    _controller.clear();
+    widget.controller.clear();
   }
 
   @override
@@ -165,8 +165,8 @@ class _MessageInputState extends State<MessageInput> {
             child: Watch(
               (context) => AppTextField(
                 hintText: 'Message in ${channelStore.currentChannel()?.name}',
-                controller: _controller,
-                focusNode: _focusNode,
+                controller: widget.controller,
+                focusNode: widget.focusNode,
                 onSubmitted: _handleSubmitted,
               ),
             ),
