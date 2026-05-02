@@ -8,6 +8,7 @@ import 'package:nerimity_desktop_flutter/views/app_text_field.dart';
 import 'package:signals/signals_flutter.dart';
 
 bool _isScrolling = false;
+Offset? _pointerDownPosition;
 
 class MessageContent extends StatefulWidget {
   final String serverId;
@@ -66,8 +67,16 @@ class MessageLog extends StatelessWidget {
         return Watch((context) {
           final messages = messageStore.messages[channelId] ?? [];
           return Listener(
-            onPointerDown: (_) => _isScrolling = false,
-            onPointerMove: (_) => _isScrolling = true,
+            onPointerDown: (e) {
+              _isScrolling = false;
+              _pointerDownPosition = e.position;
+            },
+            onPointerMove: (e) {
+              if (_pointerDownPosition != null) {
+                final delta = (e.position - _pointerDownPosition!).distance;
+                if (delta >= 10) _isScrolling = true;
+              }
+            },
             onPointerUp: (_) => Future.delayed(
               const Duration(milliseconds: 100),
               () => _isScrolling = false,
